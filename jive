@@ -1,0 +1,37 @@
+#!/bin/bash
+#---------------------------------------------------------
+#
+#---------------------------------------------------------
+
+export TANGO_HOST=172.25.65.1:10000
+
+if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
+   . /etc/tangorc
+fi
+
+LIB_DIR=./;	    export LIB_DIR
+APP_DIR=./;	    export APP_DIR
+
+#--------------------------------------------------------------------------
+#       Set the Class Path for Tango, ATK and Simple Synoptic Appli in ATK
+#--------------------------------------------------------------------------
+
+
+TANGO=$LIB_DIR/TangORB.jar
+
+TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
+ATKPANEL=$APP_DIR/atkpanel.jar
+LOGVIEWER=$APP_DIR/LogViewer.jar
+
+CLASSPATH=$TANGO:$TANGOATK:$ATKPANEL:$LOGVIEWER:$APP_DIR/Jive.jar:$APP_DIR/log4j.jar:.
+export CLASSPATH
+echo "CLASSPATH=$CLASSPATH"
+
+
+#---------------------------------------------------------
+#       Start the synoptic appli process
+#---------------------------------------------------------
+#
+
+java -mx128m -DTANGO_HOST=$TANGO_HOST jive3.MainPanel
+
