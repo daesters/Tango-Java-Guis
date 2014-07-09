@@ -1,0 +1,101 @@
+JDFile v11 {
+  Global {
+  }
+  JDLabel {
+    summit:8,16,328,44
+    origin:80,27
+    lineWidth:0
+    name:"Label"
+    font:"Dialog",1,20
+    text:"ScanServer Monitor"
+  }
+  JDRectangle {
+    summit:8,48,320,88
+    origin:140,76
+    fillStyle:1
+    name:"mott/ScanServer/soliel1/State"
+  }
+  JDSwingObject {
+    summit:8,56,320,79
+    origin:42,72
+    lineWidth:0
+    name:"mott/ScanServer/soliel1/Status"
+    extensions:{
+      unitVisible:"true"
+      userFormat:""
+      alarmEnabled:"true"
+      validBackground:"0,255,0"
+      invalidText:"-----"
+    }
+    className:"fr.esrf.tangoatk.widget.attribute.SimpleScalarViewer"
+    font:"Dialog",0,12
+  }
+  JDSwingObject {
+    summit:216,128,320,143
+    origin:250,136
+    lineWidth:0
+    name:"mott/ScanServer/soliel1/runRemainingTime"
+    extensions:{
+      unitVisible:"true"
+      userFormat:""
+      alarmEnabled:"true"
+      validBackground:"0,255,0"
+      invalidText:"-----"
+    }
+    className:"fr.esrf.tangoatk.widget.attribute.SimpleScalarViewer"
+    font:"Dialog",0,12
+  }
+  JDLabel {
+    summit:8,128,150,149
+    origin:79,139
+    lineWidth:0
+    name:"Label"
+    text:"run remaining time"
+  }
+  JDBar {
+    summit:8,96,320,112
+    origin:104,132
+    fillStyle:1
+    maxvalue:10
+    name:"mott/ScanServer/soliel1/runCompletion"
+    maxBar:100.0
+    orientation:0
+  }
+  JDSwingObject {
+    summit:40,96,288,111
+    origin:146,104
+    lineWidth:0
+    name:"mott/ScanServer/soliel1/runCompletion"
+    extensions:{
+      unitVisible:"true"
+      userFormat:""
+      alarmEnabled:"true"
+      validBackground:"0,255,0"
+      invalidText:"-----"
+    }
+    className:"fr.esrf.tangoatk.widget.attribute.SimpleScalarViewer"
+    font:"Dialog",0,12
+  }
+  JDSwingObject {
+    summit:216,160,320,175
+    origin:250,168
+    lineWidth:0
+    name:"mott/ScanServer/soliel1/runElapsed"
+    extensions:{
+      unitVisible:"true"
+      userFormat:""
+      alarmEnabled:"true"
+      validBackground:"0,255,0"
+      invalidText:"-----"
+    }
+    className:"fr.esrf.tangoatk.widget.attribute.SimpleScalarViewer"
+    font:"Dialog",0,12
+  }
+  JDLabel {
+    summit:8,160,97,181
+    origin:79,171
+    lineWidth:0
+    name:"Label"
+    text:"run elapsed"
+  }
+}
