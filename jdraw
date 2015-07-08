@@ -3,34 +3,26 @@
 #
 #---------------------------------------------------------
 
-export TANGO_HOST=172.25.65.1:10000
+LIB_DIR=./libs;	    export LIB_DIR
+APP_DIR=./libs;	    export APP_DIR
 
-if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
-   . /etc/tangorc
-fi
-
-LIB_DIR=./;	    export LIB_DIR
-APP_DIR=./;	    export APP_DIR
-LIBPATH=./libjdraw/;	    export LIBPATH
-
-#--------------------------------------------------------------------------
-#       Set the Class Path for Tango, ATK and Simple Synoptic Appli in ATK
-#--------------------------------------------------------------------------
+#---------------------------------------------------------
+#       Set the Class Path Jdraw usage
+#---------------------------------------------------------
 
 
 TANGO=$LIB_DIR/TangORB.jar
-
-TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
-ATKPANEL=$APP_DIR/atkpanel.jar
-
+TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar:$LIB_DIR/atkpanel.jar
 
 APPLI_PACKAGE=fr.esrf.tangoatk.widget.util.jdraw;	export APPLI_PACKAGE
 APPLI_MAIN_CLASS=JDrawEditorFrame; export APPLI_MAIN_CLASS
 
-CLASSPATH=$TACO:$TANGO:$TANGOATK:$ATKPANEL
+CLASSPATH=$TANGOATK:$TANGO
 export CLASSPATH
 echo "CLASSPATH=$CLASSPATH"
-echo "LIBPATH=$LIBPATH"
+
+LIBPATH=./libs
+export LIBPATH
 
 echo Running Jdraw ...
 
@@ -39,5 +31,4 @@ echo Running Jdraw ...
 #---------------------------------------------------------
 #
 
-/usr/bin/java -DLIBPATH=$LIBPATH $APPLI_PACKAGE.$APPLI_MAIN_CLASS $@
-
+/usr/bin/java -Djava.library.path=$LIBPATH $APPLI_PACKAGE.$APPLI_MAIN_CLASS $@

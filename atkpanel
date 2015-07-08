@@ -1,38 +1,29 @@
 #!/bin/bash
-#---------------------------------------------------------
 #
-#---------------------------------------------------------
-
-export TANGO_HOST=172.25.65.1:10000
+TANGO_HOME=/usr/local;		export TANGO_HOME
 
 if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
    . /etc/tangorc
 fi
 
-LIB_DIR=/home/user/TangoGuis/GenericGuis/;	    export LIB_DIR
-APP_DIR=/home/user/TangoGuis/GenericGuis/;	    export APP_DIR
-
-
-#--------------------------------------------------------------------------
-#       Set the Class Path for Tango, ATK and Simple Synoptic Appli in ATK
-#--------------------------------------------------------------------------
+#---------------------------------------------------------
+#       Set the Class Path for Tango and AtkPanel usage
+#---------------------------------------------------------
+LIB_DIR=./libs;   export LIB_DIR
 
 
 TANGO=$LIB_DIR/TangORB.jar
-
 TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
-ATKPANEL=$APP_DIR/atkpanel.jar
-LOGVIEWER=$APP_DIR/LogViewer.jar
+ATKPANEL=$LIB_DIR/atkpanel.jar
 
-CLASSPATH=$TANGO:$TANGOATK:$ATKPANEL:$LOGVIEWER:$APP_DIR/Jive.jar:$APP_DIR/log4j.jar:.
+CLASSPATH=$ATKPANEL:$TANGOATK:$TANGO
 export CLASSPATH
-echo "CLASSPATH=$CLASSPATH"
 
+LIBPATH=./libs
+export LIBPATH
 
 #---------------------------------------------------------
-#       Start the synoptic appli process
+#	Start the atkpanel process
 #---------------------------------------------------------
-#
 
-java -mx128m -DTANGO_HOST=$TANGO_HOST atkpanel.MainPanel $*
-
+/usr/bin/java -mx128m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST atkpanel.MainPanel $*

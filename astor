@@ -1,37 +1,69 @@
 #!/bin/bash
 #---------------------------------------------------------
-#
+#	
 #---------------------------------------------------------
-
-export TANGO_HOST=172.25.65.1:10000
 
 if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
    . /etc/tangorc
 fi
 
-LIB_DIR=./;	    export LIB_DIR
-APP_DIR=./;	    export APP_DIR
-
-#--------------------------------------------------------------------------
-#       Set the Class Path for Tango, ATK and Simple Synoptic Appli in ATK
-#--------------------------------------------------------------------------
-
-
-TANGO=$LIB_DIR/TangORB.jar
-
-TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
-ATKPANEL=$APP_DIR/atkpanel.jar
-LOGVIEWER=$APP_DIR/LogViewer.jar
-
-CLASSPATH=$TANGO:$TANGOATK:$ATKPANEL:$LOGVIEWER:$APP_DIR/Jive.jar:$APP_DIR/log4j.jar:$LIB_DIR/Astor.jar:$APP_DIR/tool_panels.jar:.
-export CLASSPATH
-echo "CLASSPATH=$CLASSPATH"
-
+#---------------------------------------------------------
+#	Check $DISPLAY variable
+#---------------------------------------------------------
+if [ $DISPLAY ]
+then
+	echo "Display is $DISPLAY"
+else
+	echo ""
+	echo "DISPLAY environment variable is not defined !"
+	echo "Please, enter your DISPLAY name."
+	read answer
+	if [ $answer ]
+	then
+#		get the end of string to know if ":0" has been set
+		start=`expr $answer : '.*:' \| $answer`
+		echo "$start "
+		if [ $start = $answer ]
+		then
+			DISPLAY=$answer:0
+		else
+			DISPLAY=$answer
+		fi
+		export DISPLAY
+		echo "Starting astor on $DISPLAY"
+	else
+		echo "DISPLAY is not defined ! Astor cannot start !"
+		exit
+	fi
+fi
 
 #---------------------------------------------------------
-#       Start the synoptic appli process
+#	Set the Class Path for Tango and Asor usage
+#---------------------------------------------------------
+
+LIB_DIR=./libs;	    export LIB_DIR
+APP_DIR=./libs;	    export APP_DIR
+
+TANGO_CLASS=$LIB_DIR/TangORB.jar;   export TANGO_CLASS
+
+ASTOR_CLASS=$LIB_DIR/Astor.jar;     export ASTOR_CLASS
+JIVE_CLASS=$LIB_DIR/Jive.jar;       export JIVE_CLASS
+LOGVIEWER=$LIB_DIR/LogViewer.jar;   export LOGVIEWER
+LOG4J=$LIB_DIR/log4j.jar;			export LOG4J
+
+ATK_CLASS=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
+ATK_CLASS=$ATK_CLASS:$APP_DIR/atkpanel.jar:$APP_DIR/tool_panels.jar
+export ATK_CLASS
+
+CLASSPATH=$TANGO_CLASS:$ASTOR_CLASS:$JIVE_CLASS:$ATK_CLASS:$LOGVIEWER:$LOG4J
+export CLASSPATH
+
+LIBPATH=./libs
+export LIBPATH
+
+#---------------------------------------------------------
+#	Start the Astor process
 #---------------------------------------------------------
 #
 
-java -mx128m -DTANGO_HOST=$TANGO_HOST admin.astor.Astor $*
-
+/usr/bin/java -mx128m -Djava.library.path=$LIBPATH -DTANGO_HOST=orkan.mott.loc:10000 admin.astor.Astor $*
