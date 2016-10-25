@@ -3,6 +3,11 @@
 #	
 #---------------------------------------------------------
 
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+cd $SCRIPTPATH
+
+
 if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
    . /etc/tangorc
 fi
@@ -40,6 +45,7 @@ fi
 #---------------------------------------------------------
 #	Set the Class Path for Tango and Asor usage
 #---------------------------------------------------------
+echo "Start reading libraries"
 
 LIB_DIR=./libs;	    export LIB_DIR
 APP_DIR=./libs;	    export APP_DIR
