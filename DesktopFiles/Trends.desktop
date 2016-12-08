@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Trends
+Exec=/home/geissepeter/Desktop/TangoGuis/GenericGuis/StartTrends.sh
+Icon=/usr/share/icons/custom/Trends.png
+Type=Application
+OnlyShowIn=GNOME;Unity;
+
+
+[Desktop Action New]
+Name=New Gui
+Exec=/home/geissepeter/Desktop/TangoGuis/GenericGuis/StartTrends.sh
+OnlyShowIn=Unity

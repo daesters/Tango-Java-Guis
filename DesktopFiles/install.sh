@@ -21,4 +21,9 @@ cp ./Jive.desktop /usr/share/applications/
 chmod g-x /usr/share/applications/Jive.desktop
 chmod o-x /usr/share/applications/Jive.desktop
 
+cp ./Trends.png /usr/share/icons/custom/
+cp ./Trends.desktop /usr/share/applications/
+chmod g-x /usr/share/applications/Trends.desktop
+chmod o-x /usr/share/applications/Trends.desktop
+
 echo "Installation successful"

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Astor
-Exec=/home/rafaelgort/Desktop/TangoGuis/GenericGuis/StartAstor.sh
+Exec=/home/geissepeter/Desktop/TangoGuis/GenericGuis/StartAstor.sh
 Icon=/usr/share/icons/custom/Astor.png
 Type=Application
 OnlyShowIn=GNOME;Unity;
@@ -8,5 +8,5 @@ OnlyShowIn=GNOME;Unity;
 
 [Desktop Action New]
 Name=New Gui
-Exec=/home/rafaelgort/Desktop/TangoGuis/GenericGuis/StartAstor.sh
+Exec=/home/geissepeter/Desktop/TangoGuis/GenericGuis/StartAstor.sh
 OnlyShowIn=Unity
