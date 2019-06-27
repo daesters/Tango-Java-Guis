@@ -9,6 +9,17 @@ cd $SCRIPTPATH
 #
 #---------------------------------------------------------
 
+if [ ! $TANGO_HOST ]; then 
+    if [ -f /etc/tangorc ]; then
+        . /etc/tangorc
+    elif
+        [ -f .tangorc ]; then
+        . .tangorc
+    fi
+fi
+
+export TANGO_HOST
+
 LIB_DIR=./libs;	    export LIB_DIR
 APP_DIR=./libs;	    export APP_DIR
 
