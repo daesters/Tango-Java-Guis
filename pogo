@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+cd $SCRIPTPATH
 #---------------------------------------------------------
 #	Add Doc path to $PATH (depends on OS used)
 #---------------------------------------------------------

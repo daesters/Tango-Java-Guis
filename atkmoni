@@ -1,7 +1,16 @@
 #!/bin/bash
 
-if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
-   . /etc/tangorc
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+cd $SCRIPTPATH
+
+if [ ! $TANGO_HOST ]; then 
+    if [ -f /etc/tangorc ]; then
+        . /etc/tangorc
+    elif
+        [ -f .tangorc ]; then
+        . .tangorc
+    fi
 fi
 
 #---------------------------------------------------------

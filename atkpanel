@@ -1,9 +1,19 @@
 #!/bin/bash
 #
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+cd $SCRIPTPATH
+
 TANGO_HOME=/usr/local;		export TANGO_HOME
 
-if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
-   . /etc/tangorc
+if [ ! $TANGO_HOST ]; then 
+    if [ -f /etc/tangorc ]; then
+        . /etc/tangorc
+    elif
+        [ -f .tangorc ]; then
+        . .tangorc
+    fi
 fi
 
 #---------------------------------------------------------
@@ -14,7 +24,7 @@ LIB_DIR=./libs;   export LIB_DIR
 
 TANGO=$LIB_DIR/TangORB.jar
 TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
-ATKPANEL=$LIB_DIR/atkpanel.jar
+ATKPANEL=$LIB_DIR/ATKPanel.jar
 
 CLASSPATH=$ATKPANEL:$TANGOATK:$TANGO
 export CLASSPATH
