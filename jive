@@ -7,8 +7,13 @@ cd $SCRIPTPATH
 
 applet_name=jive3.MainPanel
 
-if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
-   . /etc/tangorc
+if [ ! $TANGO_HOST ]; then 
+    if [ -f /etc/tangorc ]; then
+        . /etc/tangorc
+    elif
+        [ -f .tangorc ]; then
+        . .tangorc
+    fi
 fi
 
 #
@@ -17,7 +22,7 @@ fi
 JAVALIB=./libs
 JAVABIN=./libs
 
-ATK=$JAVALIB/ATKCore.jar:$JAVALIB/ATKWidget.jar:$JAVABIN/atkpanel.jar
+ATK=$JAVALIB/ATKCore.jar:$JAVALIB/ATKWidget.jar:$JAVABIN/ATKpanel.jar
 LOGVIEWER=$JAVALIB/LogViewer.jar
 ASTOR=$JAVALIB/Astor.jar:$JAVALIB/tools_panel.jar
 LOG4J=$JAVALIB/log4j.jar
@@ -28,4 +33,8 @@ export CLASSPATH
 LIBPATH=./libs
 export LIBPATH
 
-/usr/bin/java -mx128m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST $applet_name $@
+/usr/bin/java \
+    -mx128m \
+    -Djava.library.path=$LIBPATH \
+    -DTANGO_HOST=$TANGO_HOST \
+     $applet_name $@
