@@ -71,7 +71,7 @@ export ATK_CLASS
 CLASSPATH=$TANGO_CLASS:$ASTOR_CLASS:$JIVE_CLASS:$ATK_CLASS:$LOGVIEWER:$JSSHTERM:$DBBENCH:$LOG4J
 export CLASSPATH
 
-LOGBACK=${TANGO_LOGBACK:-/usr/local/share/tango/logback.xml}
+# LOGBACK=${TANGO_LOGBACK:-/usr/local/share/tango/logback.xml}
 
 #---------------------------------------------------------
 #       Start the Astor process
@@ -82,6 +82,5 @@ LOGBACK=${TANGO_LOGBACK:-/usr/local/share/tango/logback.xml}
     -mx128m \
      -Djava.library.path=$LIBPATH \
     -DTANGO_HOST=$TANGO_HOST \
-    -Dlogback.configurationFile="$LOGBACK" \
     admin.astor.Astor \
     "$@"
