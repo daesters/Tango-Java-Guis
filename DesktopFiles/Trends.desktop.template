@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Trends
+Exec=$HOME/Desktop/TangoGuis/GenericGuis/atkmoni
+Icon=$HOME/.local/share/icons/Trends.png
+Type=Application
+OnlyShowIn=GNOME;Unity;

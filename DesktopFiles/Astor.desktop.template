@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Astor
+Exec=$HOME/Desktop/TangoGuis/GenericGuis/astor
+Icon=$HOME/.local/share/icons/Astor.png
+Type=Application
+OnlyShowIn=GNOME;Unity;
+
+

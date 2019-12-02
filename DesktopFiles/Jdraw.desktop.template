@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Jive
+Exec=$HOME/Desktop/TangoGuis/GenericGuis/jdraw
+Icon=$HOME/.local/share/icons/Jdraw.png
+Type=Application
+OnlyShowIn=GNOME;Unity;
+

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Jive
+Exec=$HOME/Desktop/TangoGuis/GenericGuis/jive
+Icon=$HOME/.local/share/icons/Jive.png
+Type=Application
+OnlyShowIn=GNOME;Unity;
+
