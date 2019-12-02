@@ -12,6 +12,8 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 cd $SCRIPTPATH
 
+echo $SCRIPTPATH
+
 GLOBAL_APPLICATIONSDIR=/usr/share/applications
 GLOBAL_ICONDIR=/usr/share/icons/custom
 
@@ -19,7 +21,7 @@ USER_APPLICATIONSDIR=$HOME/.local/share/applications
 USER_ICONDIR=$HOME/.local/share/icons
 
 # Default path in .desktop files. Use '', not "". Otherwise, $HOME is replaced....
-DEFAULT_SCRIPTPATH='$HOME/Desktop/TangoGuis/GenericGuis/'
+DEFAULT_SCRIPTPATH='$HOME/Desktop/TangoGuis/GenericGuis'
 DEFAULT_ICONPATH='$HOME/.local/share/icons'
 
 help() {
@@ -56,10 +58,10 @@ uninstall() {
 
 # Uses the templates and replaces the correct path
 fill_templates() {
-	cat Jive.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$1+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jive.desktop
-       cat Astor.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$1+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Astor.desktop
-       cat Trends.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$1+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Trends.desktop
-       cat Jdraw.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$1+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jdraw.desktop
+	cat Jive.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jive.desktop
+       cat Astor.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Astor.desktop
+       cat Trends.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Trends.desktop
+       cat Jdraw.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jdraw.desktop
 }
 
 
@@ -101,6 +103,7 @@ check_create_dir() {
 # Main programm, local user installation
 run_user() {
 
+	
 	fill_templates $USER_APPLICATIONSDIR $USER_ICONDIR
 
 	check_create_dir $USER_ICONDIR
@@ -116,9 +119,9 @@ run_as_sudo() {
 
 	fill_templates $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
 	
-	# check_create_dir $GLOBAL_APPLICATIONSDIR
+	check_create_dir $GLOBAL_APPLICATIONSDIR
 
-	# copy_and_move $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
+	copy_and_move $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
 	
 	echo "Installation successful"
 }
