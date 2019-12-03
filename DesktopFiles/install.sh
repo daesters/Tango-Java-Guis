@@ -14,6 +14,8 @@ cd $SCRIPTPATH
 
 echo $SCRIPTPATH
 
+PROGRAMPATH=$(dirname "$SCRIPTPATH")
+
 GLOBAL_APPLICATIONSDIR=/usr/share/applications
 GLOBAL_ICONDIR=/usr/share/icons/custom
 
@@ -58,15 +60,18 @@ uninstall() {
 
 # Uses the templates and replaces the correct path
 fill_templates() {
-	cat Jive.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jive.desktop
-       cat Astor.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Astor.desktop
-       cat Trends.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Trends.desktop
-       cat Jdraw.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$SCRIPTPATH/..+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jdraw.desktop
+	# Replace default path with the current programm path
+	cat Jive.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jive.desktop
+	cat Astor.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Astor.desktop
+	cat Trends.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Trends.desktop
+	cat Jdraw.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jdraw.desktop
 }
 
 
 # Copies and moves the icons and desktop files
 copy_and_move() {
+
+	# Move Desktop files and copy icons
 
 	cp -f ./Astor.png $2
 	cp -f ./Trends.png $2
@@ -126,6 +131,7 @@ run_as_sudo() {
 	echo "Installation successful"
 }
 
+## Start of the programm
 
 # Help or uninstall
 if [ ! -z "$1" ] && ([ $1 = "--help" ] || [ $1 = "-h" ]) ; then
