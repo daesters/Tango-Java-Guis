@@ -145,6 +145,7 @@ class DownloadItem:
         
 
 class BintrayItem(DownloadItem):
+    """Binaries from Bintray.com
     
     def __init__(self, tool, url):
         self._mavenFile = 'maven-metadata.xml'
@@ -178,14 +179,10 @@ class GithubItem(DownloadItem):
         
         
 def start():
+    
     print("Check binaries...")
-    # ~ for tool,path in BintrayPaths.items():
+
     bintrayItems = [BintrayItem(tool,url) for tool,url in BintrayPaths.items()]
-    # ~ for tool in bintrayItems:
-        # ~ print(tool)
-        # ~ tool.update()
-        # ~ print(tool)
-        # ~ print(tool.isValid())
 
     
     print("Downloading...")    
@@ -199,64 +196,6 @@ def start():
             print("Cannot download",tool)
     print("...done")
     
-
-# ~ def getVersion(xmltext):
-    # ~ """Renders a XML file to get the latest version number of the binary"""
-    # ~ return minidom.parseString(xmltext).getElementsByTagName('latest')[0].firstChild.nodeValue
-
-
-    
-
-# ~ def getFileText(url):
-    # ~ return requests.get(url).text
-
-# ~ def getFileContent(url):
-    # ~ return requests.get(url).content
-
-# ~ def getJarPath(parentpath,tool,version):
-    # ~ return parentpath+version+"/"+tool+"-"+version+".jar"
-    
-# ~ def URLexists(url):
-    # ~ try:
-        # ~ status = requests.head(url).status_code
-    # ~ except ConnectionError:
-        # ~ return False
-    
-    # ~ if status == 200:
-        # ~ return True
-    # ~ else:
-        # ~ return False
-        
-# ~ def genVersionFilename(tool, version,withLib=True):
-    # ~ name = tool+"-"+version+".jar"
-    # ~ if withLib:
-        # ~ return os.path.join(libfolder,name)
-    # ~ else:
-        # ~ return name
-    
-# ~ def genFilename(tool,withLib=True):
-    # ~ name = tool+".jar"
-    # ~ if withLib:
-        # ~ return os.path.join(libfolder,name)
-    # ~ else:
-        # ~ return name
-
-# ~ def download(url,filename):
-    # ~ """Downloads a file from given URL
-    # ~ Thanks to https://stackoverflow.com/a/34863581"""
-    
-    # ~ with open(filename, "wb") as jarfile:
-        # ~ jarfile.write(getFileContent(url))
-        
-# ~ def removeDownloadSymlink(tool,version,url):
-    # ~ try:
-        # ~ os.remove(genFilename(tool))
-    # ~ except FileNotFoundError:
-        # ~ pass
-    # ~ download(url,genVersionFilename(tool, version))
-    # ~ # Symlink in lib folder
-    # ~ os.symlink(genVersionFilename(tool,version,False),genFilename(tool))
-
 
 if __name__ == "__main__":
     start();

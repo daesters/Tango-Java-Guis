@@ -20,8 +20,8 @@ POGO_CLASS=$APP_DIR/Pogo.jar;		export POGO_CLASS
 
 CLASSPATH=$PREF_DIR:$POGO_CLASS;    export CLASSPATH
 
-APPLI_PACKAGE=org.tango.pogo.pogo_gui; 	export $APPLI_PACKAGE
-APPLI_MAIN_CLASS=Pogo;		export $APPLI_MAIN_CLASS
+APPLI_PACKAGE=org.tango.pogo.pogo_gui;  export APPLI_PACKAGE
+APPLI_MAIN_CLASS=Pogo;		export APPLI_MAIN_CLASS
 
 #---------------------------------------------------------
 #	Start the Pogo process
