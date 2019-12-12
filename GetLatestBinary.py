@@ -10,8 +10,9 @@ from xml.dom import minidom
 import os
 
 
-# Check new path on https://bintray.com/tango-controls
-
+# Check new versions on https://bintray.com/tango-controls
+# In the maven-medata.xml, we find the newest version.
+# This is also the name of the folder, where we get the binaries.
 BintrayPaths = {
     'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
     'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
@@ -25,6 +26,18 @@ BintrayPaths = {
     'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
     'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/',
     #'MustFail': 'https://dl.bintray.com/Fails/',
+}
+
+# Check verion on github
+# We need assets.0.browser_download_url
+# Version is given by tag_name
+GithubPaths = {
+	'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
+}
+
+# Check versions on http://archive.apache.org/dist/logging/log4j/
+ApachePath = {
+	'log4j': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.tar.gz'
 }
 
 mavenFile = 'maven-metadata.xml'
