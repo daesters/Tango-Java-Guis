@@ -12,7 +12,7 @@ import os
 
 # Check new path on https://bintray.com/tango-controls
 
-BinaryParentURL = {
+BintrayPaths = {
     'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
     'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
     'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
@@ -36,7 +36,7 @@ JarDownload = {}
 
 def start():
     print("Check binaries...")
-    for tool,path in BinaryParentURL.items():
+    for tool,path in BintrayPaths.items():
         #print(path)
         try:
             version = getVersion(getFileText(path+mavenFile))
