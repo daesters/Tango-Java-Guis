@@ -44,7 +44,9 @@ ApachePath = {
 LIBFOLDER = './libs/'
 ERROR_VERSION_TEXT = "Couldn't find latest version"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
-JarDownload = {}
+
+
+DEBUG = True
 
 class DownloadItem:
     """General download item with
@@ -94,7 +96,7 @@ class DownloadItem:
     def download(self):
         """Downloads a file from given URL
         Thanks to https://stackoverflow.com/a/34863581"""
-        if self._URLexists(self.downloadURL):
+        if self._checkURL(self.downloadURL):
             with open(os.path.join(LIBFOLDER,self.filename), "wb") as jarfile:
                 jarfile.write(self.getFileContent(self.downloadURL))
         else:
@@ -123,18 +125,21 @@ class DownloadItem:
         self.version
     
     # "Private" functions    
-    def _URLexists(self,url=""):
+    def _checkURL(self,url=""):
+        """Check if URL exists"""
         if url == "":
             url = self._url
             
         try:
             status = requests.head(url).status_code
         except ConnectionError:
+            print("Connection error")
             return False
         
-        if status == 200:
+        if status == 200 or status == 302 or status == 301:
             return True
         else:
+            print("Access error of",url)
             return False
             
     def getFileContent(self,url):
@@ -143,9 +148,13 @@ class DownloadItem:
     def getFileText(self,url):
         return requests.get(url).text
         
+    def debugPrint(self, text):
+        if DEBUG:
+            print(text)
+        
 
 class BintrayItem(DownloadItem):
-    """Binaries from Bintray.com
+    """Binaries from Bintray.com"""
     
     def __init__(self, tool, url):
         self._mavenFile = 'maven-metadata.xml'
@@ -176,6 +185,32 @@ class BintrayItem(DownloadItem):
 class GithubItem(DownloadItem):
     def __init__(self, tool, url):
         super().__init__(tool,url)
+        self._request = None
+        self._getGithubInfos()
+        
+        
+    @property    
+    def version(self):
+        """Returns the version of the tool"""
+        if self._version == "" and self._request != None:
+            self._version = self._request.json()['tag_name']
+        
+        return self._version
+        
+    @property    
+    def downloadURL(self):
+        """Returns the download URL"""
+        if self._downloadURL == "" and self._request != None:
+            self._downloadURL = self._request.json()['assets'][0]['browser_download_url']
+            
+        return self._downloadURL
+        
+    def _getGithubInfos(self):
+        if self._checkURL():
+            self.debugPrint("In github,infos")
+            self._request = requests.get(self._url)
+            self.debugPrint(self._request.json())
+    
         
         
 def start():
@@ -183,18 +218,24 @@ def start():
     print("Check binaries...")
 
     bintrayItems = [BintrayItem(tool,url) for tool,url in BintrayPaths.items()]
+    githubItems = [GithubItem(tool,url) for tool,url in GithubPaths.items()]
 
     
     print("Downloading...")    
 
-    for tool in bintrayItems:
+    #downloadItems(bintrayItems)
+    
+    downloadItems(githubItems)
+    print("...done")
+    
+def downloadItems(siteItems):
+    for tool in siteItems:
         if tool.isValid():
             print("...Downloading",tool)
             tool.download()
             tool.createSymlink()
         else:
             print("Cannot download",tool)
-    print("...done")
     
 
 if __name__ == "__main__":
