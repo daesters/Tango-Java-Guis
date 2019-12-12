@@ -21,7 +21,7 @@ BinaryParentURL = {
     'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
     'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
     'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
-    'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
+    #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
     'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
     'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/',
     #'MustFail': 'https://dl.bintray.com/Fails/',
