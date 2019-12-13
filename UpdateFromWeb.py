@@ -15,47 +15,84 @@ import zipfile
 # Check new versions on https://bintray.com/tango-controls
 # In the maven-medata.xml, we find the newest version.
 # This is also the name of the folder, where we get the binaries.
-BintrayPaths = {
-    'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
-    'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
-    'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
-    'ATKTuning': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/',
-    'ATKWidget': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/',
-    'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
-    'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
-    'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
-    #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
-    'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
-    'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
-}
+# ~ BintrayPaths = {
+    # ~ 'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
+    # ~ 'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
+    # ~ 'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
+    # ~ 'ATKTuning': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/',
+    # ~ 'ATKWidget': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/',
+    # ~ 'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
+    # ~ 'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
+    # ~ 'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
+    # ~ #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
+    # ~ 'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
+    # ~ 'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
+# ~ }
 
-# Check verion on github. Luckely, they provide json file
-# We need assets.0.browser_download_url
-# Version is given by tag_name
-GithubPaths = {
-	'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
-}
+# ~ # Check verion on github. Luckely, they provide json file
+# ~ # We need assets.0.browser_download_url
+# ~ # Version is given by tag_name
+# ~ GithubPaths = {
+	# ~ 'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
+# ~ }
 
-# Check versions on http://archive.apache.org/dist/logging/log4j/
-GeneralDownloadPaths = {
-	'log4j': {
-        'version': '1.2.17',
-        'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
-        'postAction': True,
-        'postParameters': {
-            'function': 'unzip',
-            'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
-            #"zipfile.ZipFile('log4j-1.2.17.zip').extract('apache-log4j-1.2.17/log4j-1.2.17.jar')"
-            }
+# ~ # Check versions on http://archive.apache.org/dist/logging/log4j/
+# ~ GeneralDownloadPaths = {
+	# ~ 'log4j': {
+        # ~ 'version': '1.2.17',
+        # ~ 'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
+        # ~ 'postAction': True,
+        # ~ 'postParameters': {
+            # ~ 'function': 'unzip',
+            # ~ 'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
+            # ~ #"zipfile.ZipFile('log4j-1.2.17.zip').extract('apache-log4j-1.2.17/log4j-1.2.17.jar')"
+            # ~ }
+        # ~ },
+    # ~ 'TangORB': {
+        # ~ 'version': '8.3.5',
+        # ~ 'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
+        # ~ 'postAction': False
+    # ~ }
+# ~ }
+
+sources = {
+    'bintray': {
+        'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
+        'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
+        'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
+        'ATKTuning': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/',
+        'ATKWidget': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/',
+        'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
+        'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
+        'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
+        #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
+        'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
+        'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
         },
-    'TangORB': {
-        'version': '8.3.5',
-        'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
-        'postAction': False
+    'github': {
+        'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
+        },
+    
+    'general': {
+        'log4j': {
+            'version': '1.2.17',
+            'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
+            'postAction': True,
+            'postParameters': {
+                'function': 'unzip',
+                'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
+                }
+            },
+        'TangORB': {
+            'version': '8.3.5',
+            'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
+            'postAction': False
+            }
+        }
     }
-}
+        
+    
 
-# TangoORB
 
 
 # Constants
@@ -295,14 +332,15 @@ class GeneralDownload(DownloadItem):
                 #Unzip action
                 if fn == 'unzip' and path != "":
                     #Processing
+                    self._debugPrint("      extract and move")
                     exf = zipfile.ZipFile(fpath).\
                     extract(member=path,path=LIBFOLDER)
-                    self._debugPrint("extracted file",exf)
+                    
                     os.rename(exf,os.path.join(LIBFOLDER,self.filename))
-                    self._debugPrint("renamed to",self.filename)
+                    
                     
                     # Clean up
-                    
+                    self._debugPrint("      clean up")
                     os.rmdir(exf.rsplit('/',maxsplit=1)[0])
                     os.remove(fpath)
                 else:
@@ -325,16 +363,16 @@ def start(debug=False):
         DownloadItem.debug = debug
     print("Check binaries...")
 
-    bintrayItems = [BintrayItem(tool,url) for tool,url in BintrayPaths.items()]
-    githubItems = [GithubItem(tool,url) for tool,url in GithubPaths.items()]
-    generalItems = [GeneralDownload(tool,parameters) for tool,parameters in GeneralDownloadPaths.items()]
+    bintrayItems = [BintrayItem(tool,url) for tool,url in sources['bintray'].items()]
+    githubItems = [GithubItem(tool,url) for tool,url in sources['github'].items()]
+    generalItems = [GeneralDownload(tool,parameters) for tool,parameters in sources['general'].items()]
 
 
     
     print("Downloading...")    
 
-    #downloadItems(bintrayItems)
-    #downloadItems(githubItems)
+    downloadItems(bintrayItems)
+    downloadItems(githubItems)
     downloadItems(generalItems)
     
     print("...done")
