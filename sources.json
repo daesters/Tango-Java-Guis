@@ -1,0 +1,56 @@
+{
+    "bintray": {
+        "Astor": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/"
+        },
+        "ATKCore": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/"
+        },
+        "ATKPanel": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/"
+        },
+        "ATKTuning": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/"
+        },
+        "ATKWidget": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/"
+        },
+        "DBBench": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/"
+        },
+        "Jive": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/Jive/"
+        },
+        "JSSHTerminal": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/"
+        },
+        "LogViewer": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/"
+        },
+        "Pogo": {
+            "url": "https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/"
+        }
+    },
+    "github": {
+        "JTango": {
+            "url": "https://api.github.com/repos/tango-controls/JTango/releases/latest"
+        }
+    },
+    
+    "general": {
+        "log4j": {
+            "version": "1.2.17",
+            "url": "http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip",
+            "postAction": true,
+            "postParameters": {
+                "function": "unzip",
+                "path": "apache-log4j-1.2.17/log4j-1.2.17.jar"
+            }
+        },
+        "TangORB": {
+            "version": "8.3.5",
+            "url": "https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar",
+            "postAction": false
+        }
+    }
+}

@@ -10,89 +10,7 @@ from xml.dom import minidom
 import os
 import sys
 import zipfile
-
-
-# Check new versions on https://bintray.com/tango-controls
-# In the maven-medata.xml, we find the newest version.
-# This is also the name of the folder, where we get the binaries.
-# ~ BintrayPaths = {
-    # ~ 'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
-    # ~ 'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
-    # ~ 'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
-    # ~ 'ATKTuning': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/',
-    # ~ 'ATKWidget': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/',
-    # ~ 'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
-    # ~ 'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
-    # ~ 'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
-    # ~ #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
-    # ~ 'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
-    # ~ 'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
-# ~ }
-
-# ~ # Check verion on github. Luckely, they provide json file
-# ~ # We need assets.0.browser_download_url
-# ~ # Version is given by tag_name
-# ~ GithubPaths = {
-	# ~ 'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
-# ~ }
-
-# ~ # Check versions on http://archive.apache.org/dist/logging/log4j/
-# ~ GeneralDownloadPaths = {
-	# ~ 'log4j': {
-        # ~ 'version': '1.2.17',
-        # ~ 'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
-        # ~ 'postAction': True,
-        # ~ 'postParameters': {
-            # ~ 'function': 'unzip',
-            # ~ 'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
-            # ~ #"zipfile.ZipFile('log4j-1.2.17.zip').extract('apache-log4j-1.2.17/log4j-1.2.17.jar')"
-            # ~ }
-        # ~ },
-    # ~ 'TangORB': {
-        # ~ 'version': '8.3.5',
-        # ~ 'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
-        # ~ 'postAction': False
-    # ~ }
-# ~ }
-
-sources = {
-    'bintray': {
-        'Astor': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/Astor/',
-        'ATKCore': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKCore/',
-        'ATKPanel': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/ATKPanel/',
-        'ATKTuning': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKTuning/',
-        'ATKWidget': 'https://dl.bintray.com/tango-controls/maven/org/tango/atk/ATKWidget/',
-        'DBBench': 'https://dl.bintray.com/tango-controls/maven/org/tango/DBBench/',
-        'Jive': 'https://dl.bintray.com/tango-controls/maven/org/tango/Jive/',
-        'JSSHTerminal': 'https://dl.bintray.com/tango-controls/maven/org/tango/JSSHTerminal/',
-        #'JTangoServer': 'https://dl.bintray.com/tango-controls/jtango/org/tango-controls/JTangoServer/',
-        'LogViewer': 'https://dl.bintray.com/tango-controls/maven/org/tango/gui/LogViewer/',
-        'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
-        },
-    'github': {
-        'JTango': 'https://api.github.com/repos/tango-controls/JTango/releases/latest'
-        },
-    
-    'general': {
-        'log4j': {
-            'version': '1.2.17',
-            'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
-            'postAction': True,
-            'postParameters': {
-                'function': 'unzip',
-                'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
-                }
-            },
-        'TangORB': {
-            'version': '8.3.5',
-            'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
-            'postAction': False
-            }
-        }
-    }
-        
-    
-
+import json
 
 
 # Constants
@@ -102,33 +20,31 @@ ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
 
 
-
-
 ########### Classes ############
 
 
 ###
-# Class DownloadItem
+# Class Library
 ###
-class DownloadItem:
-    """General download item with
+class Library:
+    """General with
     - __init__ generator
-    - __string for presentin__
+    - __string__ for presenting
     - version property (abstract)
     - downloadURL (abstract)
     - isValid() 
     """
     debug = False
     
-    def __init__(self, tool, url):
+    def __init__(self, tool, parameters):
         self._tool = tool
-        self._url = url
+        self._url = parameters['url']
         self._version = ""
         self._downloadURL = ""
         
     def __str__(self):
         """String representation overload, for example when using print()"""
-        return "   "+self._tool+", "+"version: "+self._version
+        return self._tool+", "+"version: "+self._version
         
     @property
     def tool(self):
@@ -210,23 +126,24 @@ class DownloadItem:
         
     def _debugPrint(self, *text):
         if self.debug:
-            print(text)
+            print(" ".join(text))
 
 ###
-# Class BintrayItem
+# Class BintrayLib
 ###
-class BintrayItem(DownloadItem):
+class BintrayLib(Library):
     """Binaries from Bintray.com"""
     
-    def __init__(self, tool, url):
+    def __init__(self, tool, parameters):
         self._mavenFile = 'maven-metadata.xml'
-        super().__init__(tool,url)
+        super().__init__(tool,parameters)
         
     @property    
     def version(self):
         """Returns the version of the tool"""
         if self._version == "":
             try:
+                self._debugPrint("    Request",self._mavenFile )
                 xmltext = self._getFileText(self._url+self._mavenFile)
                 self._version = str(minidom.parseString(xmltext).getElementsByTagName('latest')[0].firstChild.nodeValue)
             except:
@@ -244,12 +161,12 @@ class BintrayItem(DownloadItem):
         
         
 ###
-# Class GithubItem
+# Class GithubLib
 ###
 
-class GithubItem(DownloadItem):
-    def __init__(self, tool, url):
-        super().__init__(tool,url)
+class GithubLib(Library):
+    def __init__(self, tool, parameters):
+        super().__init__(tool,parameters)
         # Store request, therefore class attribute
         self._request = None
         self._getGithubInfos()
@@ -273,14 +190,14 @@ class GithubItem(DownloadItem):
         
     def _getGithubInfos(self):
         if self._checkURL():
-            self._debugPrint("In github,infos")
+            self._debugPrint("    Request infos from github")
             self._request = requests.get(self._url)
-            self._debugPrint(self._request.json())
+
 
 ###
-# Class GeneralDownload
+# Class GeneralLib
 ###            
-class GeneralDownload(DownloadItem):
+class GeneralLib(Library):
     def __init__(self, tool, parameters):
         self._tool = tool
         self._version = parameters['version']
@@ -333,8 +250,7 @@ class GeneralDownload(DownloadItem):
                 if fn == 'unzip' and path != "":
                     #Processing
                     self._debugPrint("      extract and move")
-                    exf = zipfile.ZipFile(fpath).\
-                    extract(member=path,path=LIBFOLDER)
+                    exf = zipfile.ZipFile(fpath).extract(member=path,path=LIBFOLDER)
                     
                     os.rename(exf,os.path.join(LIBFOLDER,self.filename))
                     
@@ -360,29 +276,31 @@ class GeneralDownload(DownloadItem):
 def start(debug=False):
     """Main programm to check and start binaries"""
     if debug:
-        DownloadItem.debug = debug
+        Library.debug = debug
     print("Check binaries...")
 
-    bintrayItems = [BintrayItem(tool,url) for tool,url in sources['bintray'].items()]
-    githubItems = [GithubItem(tool,url) for tool,url in sources['github'].items()]
-    generalItems = [GeneralDownload(tool,parameters) for tool,parameters in sources['general'].items()]
-
-
+    sources = {}
+    with open('sources.json', 'r') as fsource:
+        sources = json.loads(fsource.read())
     
-    print("Downloading...")    
+    pages = []
+    pages.append([BintrayLib(tool,parameters) for tool,parameters in sources['bintray'].items()])
+    pages.append([GithubLib(tool,parameters) for tool,parameters in sources['github'].items()])
+    pages.append([GeneralLib(tool,parameters) for tool,parameters in sources['general'].items()])
 
-    downloadItems(bintrayItems)
-    downloadItems(githubItems)
-    downloadItems(generalItems)
+    print("Downloading...")    
+    
+    for page in pages:
+        process(page)
     
     print("...done")
 
 ### Helpers
-def downloadItems(siteItems):
+def process(page):
     """Downloads the Items from the various sites"""
-    for tool in siteItems:
+    for tool in page:
         if tool.isValid():
-            print("...Downloading",tool)
+            print("...Downloading",tool)   
             tool.download()
             tool.createSymlink()
         else:
@@ -410,16 +328,14 @@ if __name__ == "__main__":
     
     debug = False;
     
-    ## Check option
+    ## Check options
     if isOption(sys.argv, '-d','--debug'):
             debug = True;
             
     if isOption(sys.argv, '-h','--help'):
-        printHelp()
-        
+        printHelp() 
     elif isOption(sys.argv, '--noprompt'):
         start(debug)
-        
     else:
         answer = input("You really want to update the libs from the web? [Y/n]")
         
