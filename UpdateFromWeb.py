@@ -29,7 +29,7 @@ BintrayPaths = {
     'Pogo': 'https://dl.bintray.com/tango-controls/maven/org/tango/tools/pogo/gui/Pogo/'
 }
 
-# Check verion on github
+# Check verion on github. Luckely, they provide json file
 # We need assets.0.browser_download_url
 # Version is given by tag_name
 GithubPaths = {
@@ -47,7 +47,12 @@ GeneralDownloadPaths = {
             'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
             #"zipfile.ZipFile('log4j-1.2.17.zip').extract('apache-log4j-1.2.17/log4j-1.2.17.jar')"
             }
-        }
+        },
+    'TangORB': {
+        'version': '8.3.5',
+        'url': 'https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar',
+        'postAction': False
+    }
 }
 
 # TangoORB
