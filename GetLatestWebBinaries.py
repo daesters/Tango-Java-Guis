@@ -8,6 +8,7 @@ This starts the check and search for the latest java binaries for Tango
 import requests
 from xml.dom import minidom
 import os
+import sys
 
 
 # Check new versions on https://bintray.com/tango-controls
@@ -216,7 +217,7 @@ class GithubItem(DownloadItem):
         
         
 def start(debug=False):
-    
+    """Main programm to check and start binaries"""
     if debug:
         DownloadItem.debug = debug
     print("Check binaries...")
@@ -231,8 +232,10 @@ def start(debug=False):
     
     downloadItems(githubItems)
     print("...done")
+
     
 def downloadItems(siteItems):
+    """Downloads the Items from the various sites"""
     for tool in siteItems:
         if tool.isValid():
             print("...Downloading",tool)
@@ -241,6 +244,38 @@ def downloadItems(siteItems):
         else:
             print("Cannot download",tool)
     
+def isOption(arguments, *options):
+    """ Checks whether at least one of the options is in arguments"""
+    return not set(arguments).isdisjoint(options)
+    
+def printHelp():
+    print(
+        "This is the library updater, which takes the binaries " \
+        "from the various webpages \n" \
+        "Usage \n" \
+        "-d|--debug \t Debug option \n" \
+        "--noprompt \t Don't ask questions\n" \
+        "-h|--help \t This help"
+    )
 
 if __name__ == "__main__":
-    start();
+    
+    debug = False;
+    
+    ## Check option
+    if isOption(sys.argv, '-d','--debug'):
+            debug = True;
+            
+    if isOption(sys.argv, '-h','--help'):
+        printHelp()
+        
+    elif isOption(sys.argv, '--noprompt'):
+        start(debug)
+        
+    else:
+        answer = input("You really want to update the libs from the web? [Y/n]")
+        
+        if answer in ["y","Y",""]:
+            start(debug)
+        else:
+            print("Quit")

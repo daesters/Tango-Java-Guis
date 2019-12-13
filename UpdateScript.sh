@@ -5,7 +5,7 @@
 # from a previously compilation of the TANGO source code
 # Or it calls the web updater
 
-system() {
+systemUpdate() {
 
 rm ./libs/*
 
@@ -30,19 +30,19 @@ cp -f /usr/local/lib/libjzmq* ./libs
 
 echo "### Welcome to the Tango jAva Libraries Update Script [TALUS] :-D ###"
 
-# (1) prompt user, and read command line argument
-  read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
+read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
 
-  # (2) handle the input we were given
-  case $answer in
-   ""|[wW]* ) 
-           echo "Okay, updating from web"
-           ./GetLatestWebBinaries.py
-           ;;
 
-   [sS]* )  echo "Okay, updating from system"
-            system
-            ;;
+case $answer in
+""|[wW]* ) 
+       echo "Okay, updating from web"
+       ./GetLatestWebBinaries.py --noprompt
+       ;;
 
-   * )     echo "Dude, just enter w or s, please.";;
-  esac
+[sS]* )  echo "Okay, updating from system"
+         systemUpdate
+         echo "Done."
+        ;;
+
+* )     echo "Dude, just enter w or s, please.";;
+esac
