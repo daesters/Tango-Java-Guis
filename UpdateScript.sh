@@ -20,7 +20,7 @@ cp -f /usr/local/share/java/JSSHTerminal.jar ./libs
 cp -f /usr/local/share/java/JTango.jar ./libs
 cp -f /usr/local/share/java/log4j.jar ./libs
 cp -f /usr/local/share/java/LogViewer.jar ./libs
-cp -f /usr/local/share/java/org.tango.pogo.jar ./libs
+cp -f /usr/local/share/java/org.tango.pogo.jar ./libs/Pogo.jar
 cp -f /usr/local/share/java/TangORB.jar ./libs
 cp -f /usr/local/share/java/tool_panels.jar ./libs
 cp -f /usr/local/share/java/zmq.jar ./libs
