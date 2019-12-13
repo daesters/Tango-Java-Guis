@@ -36,7 +36,7 @@ read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
 case $answer in
 ""|[wW]* ) 
        echo "Okay, updating from web"
-       ./GetLatestWebBinaries.py --noprompt
+       ./UpdateFromWeb.py --noprompt
        ;;
 
 [sS]* )  echo "Okay, updating from system"

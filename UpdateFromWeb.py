@@ -9,6 +9,7 @@ import requests
 from xml.dom import minidom
 import os
 import sys
+import zipfile
 
 
 # Check new versions on https://bintray.com/tango-controls
@@ -36,19 +37,37 @@ GithubPaths = {
 }
 
 # Check versions on http://archive.apache.org/dist/logging/log4j/
-ApachePath = {
-	'log4j': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.tar.gz'
+GeneralDownloadPaths = {
+	'log4j': {
+        'version': '1.2.17',
+        'url': 'http://archive.apache.org/dist/logging/log4j/1.2.17/log4j-1.2.17.zip',
+        'postAction': True,
+        'postParameters': {
+            'function': 'unzip',
+            'path': 'apache-log4j-1.2.17/log4j-1.2.17.jar'
+            #"zipfile.ZipFile('log4j-1.2.17.zip').extract('apache-log4j-1.2.17/log4j-1.2.17.jar')"
+            }
+        }
 }
 
+# TangoORB
 
 
+# Constants
 LIBFOLDER = './libs/'
 ERROR_VERSION_TEXT = "Couldn't find latest version"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
+ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
 
 
 
 
+########### Classes ############
+
+
+###
+# Class DownloadItem
+###
 class DownloadItem:
     """General download item with
     - __init__ generator
@@ -56,7 +75,6 @@ class DownloadItem:
     - version property (abstract)
     - downloadURL (abstract)
     - isValid() 
-    - update()
     """
     debug = False
     
@@ -100,7 +118,7 @@ class DownloadItem:
         Thanks to https://stackoverflow.com/a/34863581"""
         if self._checkURL(self.downloadURL):
             with open(os.path.join(LIBFOLDER,self.filename), "wb") as jarfile:
-                jarfile.write(self.getFileContent(self.downloadURL))
+                jarfile.write(self._getFileContent(self.downloadURL))
         else:
             print(self._tool,ERROR_DOWNLOAD_TEXT,self.downloadURL)    
         
@@ -122,9 +140,6 @@ class DownloadItem:
             
         return True;
         
-    def update(self):
-        self.downloadURL
-        self.version
     
     # "Private" functions    
     def _checkURL(self,url=""):
@@ -145,17 +160,19 @@ class DownloadItem:
             print("Access error, status",status,"url",url)
             return False
             
-    def getFileContent(self,url):
+    def _getFileContent(self,url):
         return requests.get(url).content
             
-    def getFileText(self,url):
+    def _getFileText(self,url):
         return requests.get(url).text
         
-    def debugPrint(self, text):
+    def _debugPrint(self, *text):
         if self.debug:
             print(text)
-        
 
+###
+# Class BintrayItem
+###
 class BintrayItem(DownloadItem):
     """Binaries from Bintray.com"""
     
@@ -168,7 +185,7 @@ class BintrayItem(DownloadItem):
         """Returns the version of the tool"""
         if self._version == "":
             try:
-                xmltext = self.getFileText(self._url+self._mavenFile)
+                xmltext = self._getFileText(self._url+self._mavenFile)
                 self._version = str(minidom.parseString(xmltext).getElementsByTagName('latest')[0].firstChild.nodeValue)
             except:
                 self._version = ERROR_VERSION_TEXT
@@ -184,10 +201,14 @@ class BintrayItem(DownloadItem):
         return self._downloadURL
         
         
-        
+###
+# Class GithubItem
+###
+
 class GithubItem(DownloadItem):
     def __init__(self, tool, url):
         super().__init__(tool,url)
+        # Store request, therefore class attribute
         self._request = None
         self._getGithubInfos()
         
@@ -210,12 +231,89 @@ class GithubItem(DownloadItem):
         
     def _getGithubInfos(self):
         if self._checkURL():
-            self.debugPrint("In github,infos")
+            self._debugPrint("In github,infos")
             self._request = requests.get(self._url)
-            self.debugPrint(self._request.json())
-    
+            self._debugPrint(self._request.json())
+
+###
+# Class GeneralDownload
+###            
+class GeneralDownload(DownloadItem):
+    def __init__(self, tool, parameters):
+        self._tool = tool
+        self._version = parameters['version']
+        self._downloadURL = parameters['url']
+        self._parameters = parameters
         
+    @property    
+    def version(self):
+        """Returns the version of the tool"""
+        return self._version
         
+    @property    
+    def downloadURL(self):
+        """Returns the download URL"""
+        return self._downloadURL
+        
+    def download(self):
+        """Overwrite standard download procedure"""
+        key = 'postAction'
+        if key in self._parameters.keys() and self._parameters[key]:
+            # Post action required
+            self._download()
+        else:
+            # Normal behaviour
+            super().download()
+          
+    def _download(self):
+        """ Download file (usually a archive) and make post actions if defined"""
+        
+        if self._checkURL(self.downloadURL):
+            # Download
+            fname = self._parameters['url'].split('/')[-1]
+            fpath = os.path.join(LIBFOLDER,fname)
+            with open(fpath, "wb") as f:
+                f.write(self._getFileContent(self.downloadURL))
+                
+            #Action
+            key = 'postParameters'
+            fnKey = 'function'
+            ptKey = 'path'
+            
+            #Check postParameters
+            if key in self._parameters.keys() and \
+                fnKey in self._parameters[key].keys() and \
+                ptKey in self._parameters[key].keys():
+                
+                fn = self._parameters[key][fnKey]
+                path = self._parameters[key][ptKey]
+                #Unzip action
+                if fn == 'unzip' and path != "":
+                    #Processing
+                    exf = zipfile.ZipFile(fpath).\
+                    extract(member=path,path=LIBFOLDER)
+                    self._debugPrint("extracted file",exf)
+                    os.rename(exf,os.path.join(LIBFOLDER,self.filename))
+                    self._debugPrint("renamed to",self.filename)
+                    
+                    # Clean up
+                    
+                    os.rmdir(exf.rsplit('/',maxsplit=1)[0])
+                    os.remove(fpath)
+                else:
+                    #No post parameters
+                    print(self._tool,ERROR_PROCESS_TEXT,downloadFile)
+                
+            else:
+                print(self._tool,ERROR_PROCESS_TEXT,downloadFile)
+        else:
+            print(self._tool,ERROR_DOWNLOAD_TEXT,self.downloadURL)
+          
+
+
+######################################
+
+### Main Programm
 def start(debug=False):
     """Main programm to check and start binaries"""
     if debug:
@@ -224,16 +322,19 @@ def start(debug=False):
 
     bintrayItems = [BintrayItem(tool,url) for tool,url in BintrayPaths.items()]
     githubItems = [GithubItem(tool,url) for tool,url in GithubPaths.items()]
+    generalItems = [GeneralDownload(tool,parameters) for tool,parameters in GeneralDownloadPaths.items()]
+
 
     
     print("Downloading...")    
 
-    downloadItems(bintrayItems)
+    #downloadItems(bintrayItems)
+    #downloadItems(githubItems)
+    downloadItems(generalItems)
     
-    downloadItems(githubItems)
     print("...done")
 
-    
+### Helpers
 def downloadItems(siteItems):
     """Downloads the Items from the various sites"""
     for tool in siteItems:
@@ -257,6 +358,10 @@ def printHelp():
         "--noprompt \t Don't ask questions\n" \
         "-h|--help \t This help"
     )
+
+
+
+######## Shell script ############
 
 if __name__ == "__main__":
     
