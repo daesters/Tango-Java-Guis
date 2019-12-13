@@ -46,7 +46,7 @@ ERROR_VERSION_TEXT = "Couldn't find latest version"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
 
 
-DEBUG = True
+
 
 class DownloadItem:
     """General download item with
@@ -57,6 +57,7 @@ class DownloadItem:
     - isValid() 
     - update()
     """
+    debug = False
     
     def __init__(self, tool, url):
         self._tool = tool
@@ -133,13 +134,14 @@ class DownloadItem:
         try:
             status = requests.head(url).status_code
         except ConnectionError:
-            print("Connection error")
+            print("Connection error to",url)
             return False
         
-        if status == 200 or status == 302 or status == 301:
+        # corresponds to HTTP 200 and 302
+        if status in [requests.codes.ok, requests.codes.found]:
             return True
         else:
-            print("Access error of",url)
+            print("Access error, status",status,"url",url)
             return False
             
     def getFileContent(self,url):
@@ -149,7 +151,7 @@ class DownloadItem:
         return requests.get(url).text
         
     def debugPrint(self, text):
-        if DEBUG:
+        if self.debug:
             print(text)
         
 
@@ -213,8 +215,10 @@ class GithubItem(DownloadItem):
     
         
         
-def start():
+def start(debug=False):
     
+    if debug:
+        DownloadItem.debug = debug
     print("Check binaries...")
 
     bintrayItems = [BintrayItem(tool,url) for tool,url in BintrayPaths.items()]
@@ -223,7 +227,7 @@ def start():
     
     print("Downloading...")    
 
-    #downloadItems(bintrayItems)
+    downloadItems(bintrayItems)
     
     downloadItems(githubItems)
     print("...done")
