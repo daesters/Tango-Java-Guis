@@ -10,11 +10,11 @@ cd $SCRIPTPATH
 #---------------------------------------------------------
 
 if [ ! $TANGO_HOST ]; then 
-    if [ -f /etc/tangorc ]; then
-        . /etc/tangorc
-    elif
+    if
         [ -f .tangorc ]; then
         . .tangorc
+    elif [ -f /etc/tangorc ]; then
+        . /etc/tangorc
     fi
 fi
 

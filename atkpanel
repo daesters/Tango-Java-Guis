@@ -7,13 +7,15 @@ cd $SCRIPTPATH
 
 
 if [ ! $TANGO_HOST ]; then 
-    if [ -f /etc/tangorc ]; then
-        . /etc/tangorc
-    elif
+    if
         [ -f .tangorc ]; then
         . .tangorc
+    elif [ -f /etc/tangorc ]; then
+        . /etc/tangorc
     fi
 fi
+
+export TANGO_HOST
 
 #---------------------------------------------------------
 #       Set the Class Path for Tango and AtkPanel usage
@@ -26,7 +28,6 @@ TANGOATK=$LIB_DIR/ATKCore.jar:$LIB_DIR/ATKWidget.jar
 ATKPANEL=$LIB_DIR/ATKPanel.jar
 
 CLASSPATH=$ATKPANEL:$TANGOATK:$TANGO
-#CLASSPATH=$ATKPANEL:$TANGOATK
 export CLASSPATH
 
 LIBPATH=./libs
