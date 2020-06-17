@@ -24,6 +24,7 @@ Start the TANGO Guis in your shell, for example
   
   To have it exported persistently write the command in your .bashrc file 
   (home/<username\>/.bashrc) or in /etc/tangorc
+  
   Or add the environment variable to the file /etc/environment
   (note: you need superuser priviledges).
   Add the line `TANGO_HOST=orkan.mott.loc:10000`
