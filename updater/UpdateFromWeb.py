@@ -3,6 +3,19 @@
 """GetLatestBinary
 
 This starts the check and search for the latest java binaries for Tango
+
+How is this performed?
+There are three known sources for TANGO binaries
+- bintray.com
+- github.com
+- general websites
+
+To access the various sources and to download the binaries directly,
+this script has been written.
+It contains
+- base Library class
+- BintrayLib class whicch 
+- 
 """
 
 import requests
@@ -14,7 +27,7 @@ import json
 
 
 # Constants
-LIBFOLDER = './libs/'
+LIBFOLDER = '../libs/'
 ERROR_VERSION_TEXT = "Couldn't find latest version"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
