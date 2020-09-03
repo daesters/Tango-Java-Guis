@@ -25,6 +25,8 @@ import sys
 import zipfile
 import json
 
+import shutil
+
 
 # Constants
 LIBFOLDER = '../libs/'
@@ -50,6 +52,7 @@ class Library:
     debug = False
     allowSymlink = True
     allowDownload = True
+    makeCopy = False
     
     def __init__(self, tool, parameters):
         self._tool = tool
@@ -82,15 +85,22 @@ class Library:
         return self.tool+"-"+self.version+".jar"
         
     @property
-    def symlinkname(self):
+    def generalname(self):
         """Name of the general symlink (to the jar file) without version numbers"""
         return self.tool+".jar"
+    
+    
+    def relativepath(self, name=""):
+        """Path of the library file name or given name in lib folder"""
+        if name == "":
+            name = self.filename
+        return os.path.join(LIBFOLDER, name)
         
     def download(self):
         """Downloads a file from given URL
         Thanks to https://stackoverflow.com/a/34863581"""
         if self._checkURL(self.downloadURL):
-            with open(os.path.join(LIBFOLDER,self.filename), "wb") as jarfile:
+            with open(self.relativepath(), "wb") as jarfile:
                 jarfile.write(self._getFileContent(self.downloadURL))
         else:
             print(self._tool,ERROR_DOWNLOAD_TEXT,self.downloadURL)    
@@ -99,11 +109,20 @@ class Library:
     def createSymlink(self):
         """Create a symlink to the jar file"""
         try:
-            os.remove(os.path.join(LIBFOLDER,self.symlinkname))
+            os.remove(self.relativepath(self.generalname))
         except FileNotFoundError:
             pass
         # Symlink in lib folder
-        os.symlink(self.filename,os.path.join(LIBFOLDER,self.symlinkname))
+        os.symlink(self.relativepath(),self.relativepath(self.generalname))
+        
+    def copy(self):
+        """Copies the jar file without the version in the file name"""
+        try:
+            os.remove(self.relativepath(self.generalname))
+        except FileNotFoundError:
+            pass
+        # Copy in lib folder
+        shutil.copy(self.relativepath(),self.relativepath(self.generalname))
         
     def isValid(self):
         """Determines, whethter this item is valid to download"""
@@ -248,7 +267,7 @@ class GeneralLib(Library):
         if self._checkURL(self.downloadURL):
             # Download
             fname = self._parameters['url'].split('/')[-1]
-            fpath = os.path.join(LIBFOLDER,fname)
+            fpath = self.relativepath(fname)
             with open(fpath, "wb") as f:
                 f.write(self._getFileContent(self.downloadURL))
                 
@@ -270,19 +289,27 @@ class GeneralLib(Library):
                     self._debugPrint("      extract and move")
                     exf = zipfile.ZipFile(fpath).extract(member=path,path=LIBFOLDER)
                     
-                    os.rename(exf,os.path.join(LIBFOLDER,self.filename))
+                    try:
+                        os.rename(exf,self.relativepath())
+                    except FileExistsError:
+                        os.remove(self.relativepath())
+                        os.rename(exf,self.relativepath())
                     
                     
                     # Clean up
                     self._debugPrint("      clean up")
-                    os.rmdir(exf.rsplit('/',maxsplit=1)[0])
-                    os.remove(fpath)
+                    try:
+                        # FIXME: Fails on windows
+                        os.rmdir(exf.rsplit('/',maxsplit=1)[0])
+                        os.remove(fpath)
+                    except:
+                        print("       Cleanup failed for tool",self.tool,"!!!")
                 else:
                     #No post parameters
-                    print(self._tool,ERROR_PROCESS_TEXT,downloadFile)
+                    print(self._tool,ERROR_PROCESS_TEXT,fname)
                 
             else:
-                print(self._tool,ERROR_PROCESS_TEXT,downloadFile)
+                print(self._tool,ERROR_PROCESS_TEXT,fname)
         else:
             print(self._tool,ERROR_DOWNLOAD_TEXT,self.downloadURL)
           
@@ -291,11 +318,12 @@ class GeneralLib(Library):
 ######################################
 
 ### Main Programm
-def start(debug=False,allowDownload=True,allowSymlink=True):
+def start(debug=False,allowDownload=True,allowSymlink=True,makeCopy=False):
     """Main programm to check and start binaries"""
     print("Check binaries...")
     
-    Library.debug, Library.allowDownload, Library.allowSymlink = (debug, allowDownload, allowSymlink)
+    Library.debug, Library.allowDownload, Library.allowSymlink, Library.makeCopy =\
+        (debug, allowDownload, allowSymlink, makeCopy)
     
     sources = {}
     with open('sources.json', 'r') as fsource:
@@ -322,7 +350,11 @@ def process(page):
             if Library.allowDownload:
                 print("...download",tool)
                 tool.download()
-            if Library.allowSymlink:
+                
+            if Library.makeCopy:          
+                print("... copy jarfile for",tool)
+                tool.copy()
+            elif Library.allowSymlink:
                 print("... create symlink for",tool)
                 tool.createSymlink()
         else:
@@ -340,6 +372,7 @@ def printHelp():
         "-d|--debug \t Debug option \n" \
         "-n|--no-download \t Don't donwload files \n" \
         "-t|--no-symlinks \t Don't create symlinks \n" \
+        "-c|--copy \t\t Create copies instead of symlinks \n" \
         "-y|assume-yes \t Assume yes and don't ask questions\n" \
         "-h|--help \t This help"
     )
@@ -353,6 +386,7 @@ if __name__ == "__main__":
     debug = False
     allowSymlink = True
     allowDownload = True
+    makeCopy = False
     
     helpNeeded = False
     assumeYes = False
@@ -366,6 +400,9 @@ if __name__ == "__main__":
     ## Check symlink flag
     if isOption(sys.argv, '-t','--no-symlinks'):
             allowSymlink = False;
+    ## Check copy flag
+    if isOption(sys.argv, '-c','--copy'):
+            makeCopy = True;
     # Check help flag    
     if isOption(sys.argv, '-h','--help'):
             helpNeeded = True;
@@ -379,15 +416,19 @@ if __name__ == "__main__":
         print("There is nothing to do... Quit")
     else:
         answer = "invalid"
-        if not assumeYes and allowDownload:
-            answer = input("You really want to update the libs from the web? [Y/n]")
-        if not assumeYes and allowSymlink:
-            answer = input("You really want to create symbolic links? [Y/n]")    
-        
+        if not assumeYes:
+            if allowDownload:
+                answer = input("You really want to update the libs from the web? [Y/n]")
+            elif makeCopy:
+                answer = input("You really want to copy (and overwrite?) the libraries? [Y/n]")
+            elif allowSymlink:
+                answer = input("You really want to create symbolic links? [Y/n]") 
+            
         
         if assumeYes or answer in ["y","Y",""]:
             start(debug=debug,
                 allowSymlink=allowSymlink,
-                allowDownload=allowDownload)
+                allowDownload=allowDownload,
+                makeCopy=makeCopy)
         else:
             print("Quit")
