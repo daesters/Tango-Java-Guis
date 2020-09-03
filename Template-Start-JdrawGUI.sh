@@ -10,7 +10,7 @@ TANGO_HOST=orkan.mott.loc:10000
 
 
 # -------------------
-# The rest should work witouth problems
+# The rest should work witouth new settings ;-)
 
 if [ ! $TANGO_HOST ] && [ -f /etc/tangorc ]; then
    . /etc/tangorc
