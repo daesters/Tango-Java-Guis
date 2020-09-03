@@ -82,7 +82,7 @@ case $answer in
 	""|[wW]* ) 
 
 		output "Okay, updating from web" "info"
-	   ./WebUpdate-Symlink.py --noprompt
+		./WebUpdate-Symlink.py --assume-yes
 	   ;;
 
 	[sS]* )  
