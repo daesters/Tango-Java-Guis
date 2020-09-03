@@ -80,13 +80,9 @@ read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
 
 case $answer in
 	""|[wW]* ) 
-<<<<<<< HEAD:scripts/UpdateScript.sh
-		output "Okay, updating from web"
-	   ./WebUpdate-Symlink.py --noprompt
-=======
+
 		output "Okay, updating from web" "info"
-	   ./UpdateFromWeb.py --noprompt
->>>>>>> 79c5a44795c48dc95491d624f546b5b634e46707:updater/UpdateScript.sh
+	   ./WebUpdate-Symlink.py --noprompt
 	   ;;
 
 	[sS]* )  

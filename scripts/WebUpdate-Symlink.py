@@ -338,7 +338,9 @@ def printHelp():
         "from the various webpages \n" \
         "Usage \n" \
         "-d|--debug \t Debug option \n" \
-        "--noprompt \t Don't ask questions\n" \
+        "-n|--no-download \t Don't donwload files \n" \
+        "-t|--no-symlinks \t Don't create symlinks \n" \
+        "-y|assume-yes \t Assume yes and don't ask questions\n" \
         "-h|--help \t This help"
     )
 
@@ -352,25 +354,40 @@ if __name__ == "__main__":
     allowSymlink = True
     allowDownload = True
     
-    ## Check options
+    helpNeeded = False
+    assumeYes = False
+    
+    ## Check debug flag
     if isOption(sys.argv, '-d','--debug'):
             debug = True;
-    ## Check options
-    if isOption(sys.argv, '-n','--nodownload'):
+    ## Check download flag
+    if isOption(sys.argv, '-n','--no-download'):
             allowDownload = False;
-    ## Check options
-    if isOption(sys.argv, '-t','--nosymlinks'):
+    ## Check symlink flag
+    if isOption(sys.argv, '-t','--no-symlinks'):
             allowSymlink = False;
-        
-     
+    # Check help flag    
     if isOption(sys.argv, '-h','--help'):
-        printHelp() 
-    elif isOption(sys.argv, '-y', '--noprompt'):
-        start(debug=debug,allowSymlink=allowSymlink,allowDownload=allowDownload)
+            helpNeeded = True;
+    # Check assume-yes flag
+    if isOption(sys.argv, '-y', '--assume-yes'):
+            assumeYes = True;
+     
+    if helpNeeded:
+        printHelp()
+    elif not allowSymlink and not allowDownload:
+        print("There is nothing to do... Quit")
     else:
-        answer = input("You really want to update the libs from the web? [Y/n]")
+        answer = "invalid"
+        if not assumeYes and allowDownload:
+            answer = input("You really want to update the libs from the web? [Y/n]")
+        if not assumeYes and allowSymlink:
+            answer = input("You really want to create symbolic links? [Y/n]")    
         
-        if answer in ["y","Y",""]:
-            start()
+        
+        if assumeYes or answer in ["y","Y",""]:
+            start(debug=debug,
+                allowSymlink=allowSymlink,
+                allowDownload=allowDownload)
         else:
             print("Quit")
