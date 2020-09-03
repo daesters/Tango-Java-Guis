@@ -78,7 +78,7 @@ read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
 case $answer in
 	""|[wW]* ) 
 		output "Okay, updating from web"
-	   ./UpdateFromWeb.py --noprompt
+	   ./WebUpdate-Symlink.py --noprompt
 	   ;;
 
 	[sS]* )  

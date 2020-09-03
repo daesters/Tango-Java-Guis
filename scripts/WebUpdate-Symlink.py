@@ -14,7 +14,7 @@ import json
 
 
 # Constants
-LIBFOLDER = './libs/'
+LIBFOLDER = '../libs/'
 ERROR_VERSION_TEXT = "Couldn't find latest version"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
@@ -35,6 +35,8 @@ class Library:
     - isValid() 
     """
     debug = False
+    allowSymlink = True
+    allowDownload = True
     
     def __init__(self, tool, parameters):
         self._tool = tool
@@ -119,12 +121,15 @@ class Library:
             return False
             
     def _getFileContent(self,url):
+        """Get the content of the file of the given URL"""
         return requests.get(url).content
             
     def _getFileText(self,url):
+        """Get the text of the file of the given URL"""
         return requests.get(url).text
         
     def _debugPrint(self, *text):
+        """Prints text when self.debug is True"""
         if self.debug:
             print(" ".join(text))
 
@@ -273,12 +278,12 @@ class GeneralLib(Library):
 ######################################
 
 ### Main Programm
-def start(debug=False):
+def start(debug=False,allowDownload=True,allowSymlink=True):
     """Main programm to check and start binaries"""
-    if debug:
-        Library.debug = debug
     print("Check binaries...")
-
+    
+    Library.debug, Library.allowDownload, Library.allowSymlink = (debug, allowDownload, allowSymlink)
+    
     sources = {}
     with open('sources.json', 'r') as fsource:
         sources = json.loads(fsource.read())
@@ -288,7 +293,7 @@ def start(debug=False):
     pages.append([GithubLib(tool,parameters) for tool,parameters in sources['github'].items()])
     pages.append([GeneralLib(tool,parameters) for tool,parameters in sources['general'].items()])
 
-    print("Downloading...")    
+    print("Processing...")    
     
     for page in pages:
         process(page)
@@ -300,9 +305,13 @@ def process(page):
     """Downloads the Items from the various sites"""
     for tool in page:
         if tool.isValid():
-            print("...Downloading",tool)   
-            tool.download()
-            tool.createSymlink()
+            
+            if Library.allowDownload:
+                print("...download",tool)
+                tool.download()
+            if Library.allowSymlink:
+                print("... create symlink for",tool)
+                tool.createSymlink()
         else:
             print("Cannot download",tool)
     
@@ -326,20 +335,29 @@ def printHelp():
 
 if __name__ == "__main__":
     
-    debug = False;
+    debug = False
+    allowSymlink = True
+    allowDownload = True
     
     ## Check options
     if isOption(sys.argv, '-d','--debug'):
             debug = True;
-            
+    ## Check options
+    if isOption(sys.argv, '-n','--nodownload'):
+            allowDownload = False;
+    ## Check options
+    if isOption(sys.argv, '-t','--nosymlinks'):
+            allowSymlink = False;
+        
+     
     if isOption(sys.argv, '-h','--help'):
         printHelp() 
-    elif isOption(sys.argv, '--noprompt'):
-        start(debug)
+    elif isOption(sys.argv, '-y', '--noprompt'):
+        start(debug=debug,allowSymlink=allowSymlink,allowDownload=allowDownload)
     else:
         answer = input("You really want to update the libs from the web? [Y/n]")
         
         if answer in ["y","Y",""]:
-            start(debug)
+            start()
         else:
             print("Quit")

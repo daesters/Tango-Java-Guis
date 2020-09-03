@@ -2,3 +2,7 @@
 #No cache stuff
 __pycache__
 
+# Ignore symlinks (jar files without a 'dash' and a version)
+libs/*.jar
+!libs/*-*.jar
+
