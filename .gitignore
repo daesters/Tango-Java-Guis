@@ -1,3 +1,6 @@
+# Ignore local configuration
+
+.tangorc
 
 #No cache stuff
 __pycache__

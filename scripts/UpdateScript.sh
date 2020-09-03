@@ -5,7 +5,8 @@
 # from a previously compilation of the TANGO source code
 # Or it calls the web updater
 
-#!/bin/bash
+# Library folder
+LIBS = "../libs"
 
 # Reset
 Color_Off='\033[0m'       # Text Reset
@@ -19,6 +20,8 @@ Blue='\033[0;34m'         # Blue
 Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
 White='\033[0;37m'        # White
+
+
 
 # output colorized
 output() {
@@ -48,25 +51,25 @@ output() {
 
 systemUpdate() {
 
-rm ./libs/*
+rm $LIBS/*
 
-cp -f /usr/local/share/java/Astor.jar ./libs
-cp -f /usr/local/share/java/ATKCore.jar ./libs
-cp -f /usr/local/share/java/ATKPanel.jar ./libs
-cp -f /usr/local/share/java/ATKWidget.jar ./libs
-cp -f /usr/local/share/java/DBBench.jar ./libs
-cp -f /usr/local/share/java/DeviceTree.jar ./libs
-cp -f /usr/local/share/java/Jive.jar ./libs
-cp -f /usr/local/share/java/JSSHTerminal.jar ./libs
-cp -f /usr/local/share/java/JTango.jar ./libs
-cp -f /usr/local/share/java/log4j.jar ./libs
-cp -f /usr/local/share/java/LogViewer.jar ./libs
-cp -f /usr/local/share/java/org.tango.pogo.jar ./libs/Pogo.jar
-cp -f /usr/local/share/java/TangORB.jar ./libs
-cp -f /usr/local/share/java/tool_panels.jar ./libs
-cp -f /usr/local/share/java/zmq.jar ./libs
-cp -f /usr/local/lib/libzmq* ./libs
-cp -f /usr/local/lib/libjzmq* ./libs
+cp -f /usr/local/share/java/Astor.jar .$LIBS
+cp -f /usr/local/share/java/ATKCore.jar $LIBS
+cp -f /usr/local/share/java/ATKPanel.jar $LIBS
+cp -f /usr/local/share/java/ATKWidget.jar $LIBS
+cp -f /usr/local/share/java/DBBench.jar $LIBS
+cp -f /usr/local/share/java/DeviceTree.jar $LIBS
+cp -f /usr/local/share/java/Jive.jar $LIBS
+cp -f /usr/local/share/java/JSSHTerminal.jar $LIBS
+cp -f /usr/local/share/java/JTango.jar $LIBS
+cp -f /usr/local/share/java/log4j.jar $LIBS
+cp -f /usr/local/share/java/LogViewer.jar $LIBS
+cp -f /usr/local/share/java/org.tango.pogo.jar $LIBS/Pogo.jar
+cp -f /usr/local/share/java/TangORB.jar $LIBS
+cp -f /usr/local/share/java/tool_panels.jar $LIBS
+cp -f /usr/local/share/java/zmq.jar .$LIBS
+cp -f /usr/local/lib/libzmq* $LIBS
+cp -f /usr/local/lib/libjzmq* $LIBS
 }
 
 
@@ -77,12 +80,17 @@ read -p "You want to update from the web (w) or from system (s)? [W/s] " answer
 
 case $answer in
 	""|[wW]* ) 
+<<<<<<< HEAD:scripts/UpdateScript.sh
 		output "Okay, updating from web"
 	   ./WebUpdate-Symlink.py --noprompt
+=======
+		output "Okay, updating from web" "info"
+	   ./UpdateFromWeb.py --noprompt
+>>>>>>> 79c5a44795c48dc95491d624f546b5b634e46707:updater/UpdateScript.sh
 	   ;;
 
 	[sS]* )  
-		output "Okay, updating from system"
+		output "Okay, updating from system" "info"
 		systemUpdate
 		output "Done." "success"
 		;;
