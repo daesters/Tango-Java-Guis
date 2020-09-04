@@ -28,6 +28,15 @@ Start the TANGO Guis in your shell, for example
   Or add the environment variable to the file /etc/environment
   (note: you need superuser priviledges).
   Add the line `TANGO_HOST=orkan.mott.loc:10000`
+  
+#### Symlinks (Linux) or copy files
+The libraries in the libs folder contain the version number.
+In order to avoid to change the scripts every time an update has been performed, we use symlinks (linux) or copy the library files (Windows) in the libs order. These symlinks/copies don't contain the version number.
+
+If you have updated the repo or just clone, you need to performe the creation of symlinks /copies.
+
+1. Go to the folder scripts
+2. Execute CreateSymlinks.sh (linux) or CreateCopies.bat (Windows)
 
 #### Access the green network
 
