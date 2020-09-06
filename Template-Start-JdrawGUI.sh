@@ -54,13 +54,5 @@ LIBPATH=./libs
 #---------------------------------------------------------
 #
 
-# Checking Java version
-JAVA_VERSION=`java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f-2`
-if [ "$JAVA_VERSION" != "$JAVA_VERSION_NEEDED" ]; then
-	echo "Using java version $JAVA_VERSION instead of $JAVA_VERSION_NEEDED. Might not work"
-else
-	echo "Using java version $JAVA_VERSION. Should work"
-fi
-
-java -mx$MEMORY_ALLOCATIONm -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST $APPLI_PACKAGE.$APPLI_MAIN_CLASS $GUINAME
+java -mx"$MEMORY_ALLOCATION"m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST $APPLI_PACKAGE.$APPLI_MAIN_CLASS $GUINAME
 
