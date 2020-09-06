@@ -1,5 +1,5 @@
 #!/bin/bash
-
+$JAVA_VERSION_NEEDED=1.8
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 cd $SCRIPTPATH
@@ -31,6 +31,17 @@ APPLI_MAIN_CLASS=Trend; export APPLI_MAIN_CLASS
 CLASSPATH=$TANGO:$TACO:$TANGOATK
 export CLASSPATH
 echo "CLASSPATH=$CLASSPATH"
+
+#---------------------------------------------------------
+#      Checking java version 
+#---------------------------------------------------------
+
+JAVA_VERSION=`java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f-2`
+if [ "$JAVA_VERSION" != "$JAVA_VERSION_NEEDED" ]; then
+        echo "Using java version $JAVA_VERSION instead of $JAVA_VERSION_NEEDED. Might not work"
+else
+        echo "Using java version $JAVA_VERSION. Should work"
+fi
 
 #---------------------------------------------------------
 #       Start the atkmoni process
