@@ -2,7 +2,9 @@
 :: ---------------------------------------------------------
 
 @set TANGO_HOST=172.25.65.1:10000
-@set LIBPATH=libs\
+@set LIBPATH=%~dp0\libs\
+:: "%0" would be the full path of scripts, and "~dp" is a modifier 
+:: to have the path without this script's filename
 
 :: java -mx128m -DTANGO_HOST=%TANGO_HOST% fr.esrf.tangoatk.widget.jdraw.SimpleSynopticAppli panels/Ueberwachung.jdw
 :: java -mx128m -DTANGO_HOST=%TANGO_HOST% -cp %LIB_DIR% fr.esrf.tangoatk.widget.jdraw.SimpleSynopticAppli panels/Ueberwachung.jdw
