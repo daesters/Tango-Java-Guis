@@ -1,5 +1,6 @@
 :: @echo off
 :: ---------------------------------------------------------
+:: Needs Javaversion 11 or beyond..
 
 @set TANGO_HOST=172.25.65.1:10000
 :: must be absolute, so Salsa can call this script correctly
