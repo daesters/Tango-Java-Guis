@@ -15,5 +15,4 @@
 
 call %SCRIPTPATH%general.bat
 
-call general.bat
 
