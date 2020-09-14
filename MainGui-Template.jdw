@@ -1,0 +1,74 @@
+JDFile v11 {
+  Global {
+  }
+  JDRectangle {
+    summit:16,16,449,224
+    origin:236,106
+    name:"Rectangle"
+  }
+  JDSwingObject {
+    summit:48,174,416,208
+    origin:197,184
+    foreground:51,51,51
+    background:238,238,238
+    fillStyle:1
+    lineWidth:0
+    name:"sem/beckhoff/adsBridge/Init"
+    extensions:{
+      text:"Init"
+    }
+    className:"fr.esrf.tangoatk.widget.command.VoidVoidCommandViewer"
+    font:"Dialog",1,12
+    border:3
+  }
+  JDRectangle {
+    summit:50,112,112,161
+    origin:96,124
+    fillStyle:1
+    antiAlias:true
+    name:"sem/beckhoff/adsBridge/State"
+    extensions:{
+      className:"atkpanel.MainPanel"
+    }
+  }
+  JDSwingObject {
+    summit:126,116,416,160
+    origin:155,124
+    fillStyle:1
+    lineWidth:0
+    name:"sem/beckhoff/adsBridge/Status"
+    extensions:{
+      unitVisible:"true"
+      userFormat:""
+      alarmEnabled:"true"
+      validBackground:"0,255,0"
+      invalidText:"-----"
+    }
+    className:"fr.esrf.tangoatk.widget.attribute.SimpleScalarViewer"
+    font:"Dialog",0,12
+  }
+  JDLabel {
+    summit:16,16,448,64
+    origin:155,43
+    lineWidth:0
+    name:"Label"
+    font:"Dialog",1,28
+    text:"SEM ADS bridge (example) "
+  }
+  JDLabel {
+    summit:48,80,112,102
+    origin:84,91
+    lineWidth:0
+    name:"Label"
+    font:"Dialog",1,14
+    text:"State"
+  }
+  JDLabel {
+    summit:128,80,416,102
+    origin:164,91
+    lineWidth:0
+    name:"Label"
+    font:"Dialog",3,14
+    text:"Status"
+  }
+}
