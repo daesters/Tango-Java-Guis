@@ -27,14 +27,17 @@ import json
 
 import shutil
 import threading
+import time
 
 
 # Constants
 LIBFOLDER = '../libs/'
 SOURCE_FILE = 'sources.json'
 ERROR_VERSION_TEXT = "Couldn't find latest version"
+TIMEOUT_DOWNLOAD_TEXT = "Timeout occured when downloading"
 ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
+TIMEOUT_TOOL_PROCESS_TEXT = "Couldn't finish proccessing, timeout occured"
 
 
 # ####### Classes ############
@@ -52,6 +55,7 @@ class Library:
     """
 
     debug = False
+    timeout = 10
 
     def __init__(self, tool, parameters):
         self._tool = tool
@@ -89,6 +93,7 @@ class Library:
         without version numbers"""
         return self.tool+".jar"
 
+
     def relativepath(self, name=""):
         """Path of the library file name or given name in lib folder"""
         if name == "":
@@ -100,9 +105,12 @@ class Library:
         Thanks to https://stackoverflow.com/a/34863581"""
         if self._checkURL(self.downloadURL):
             with open(self.relativepath(), "wb") as jarfile:
-                jarfile.write(self._getFileContent(self.downloadURL))
+                try:
+                    jarfile.write(self._getFileContent(self.downloadURL))
+                except requests.exceptions.Timeout:
+                    raise DownloadError(self._tool, TIMEOUT_DOWNLOAD_TEXT, self.downloadURL)
         else:
-            print(self._tool, ERROR_DOWNLOAD_TEXT, self.downloadURL)
+            raise DownloadError(self._tool, ERROR_DOWNLOAD_TEXT, self.downloadURL)
 
     def createSymlink(self):
         """Create a symlink to the jar file"""
@@ -151,11 +159,17 @@ class Library:
 
     def _getFileContent(self, url):
         """Get the content of the file of the given URL"""
-        return requests.get(url).content
+        try:
+            return requests.get(url, timeout=self.timeout).content
+        except requests.exceptions.Timeout:
+            raise DownloadError(self.tool, TIMEOUT_DOWNLOAD_TEXT, url)
 
     def _getFileText(self, url):
         """Get the text of the file of the given URL"""
-        return requests.get(url).text
+        try:
+            return requests.get(url, timeout=self.timeout).text
+        except requests.exceptions.Timeout:
+            raise DownloadError(self.tool, TIMEOUT_DOWNLOAD_TEXT, url)
 
     def _debugPrint(self, *text):
         """Prints text when self.debug is True"""
@@ -298,19 +312,37 @@ class GeneralLib(Library):
                     self._debugPrint("      clean up")
                     try:
                         # FIXME: Fails on windows
-                        os.rmdir(exf.rsplit('/',maxsplit=1)[0])
+                        os.rmdir(exf.rsplit('/', maxsplit=1)[0])
                         os.remove(fpath)
-                    except:
-                        print("       Cleanup failed for tool", self.tool, "!!!")
+                    except OSError:
+                        raise ProcessError("       Cleanup failed for tool",
+                                            self.tool, "!!!")
                 else:
                     #No post parameters
-                    print(self._tool, ERROR_PROCESS_TEXT,fname)
+                    raise ProcessError(self._tool, ERROR_PROCESS_TEXT, fname)
 
             else:
-                print(self._tool, ERROR_PROCESS_TEXT,fname)
+                raise ProcessError(self._tool, ERROR_PROCESS_TEXT, fname)
         else:
-            print(self._tool, ERROR_DOWNLOAD_TEXT, self.downloadURL)
+            raise DownloadError(self._tool, ERROR_DOWNLOAD_TEXT,
+                                self.downloadURL)
 
+
+# User Exception classes
+class DownloadError(Exception):
+    """Exception raised when problems with download occur"""
+    def __init__(self, tool, text, url=None):
+        self.tool = tool
+        self.text = text
+        self.url = url
+
+
+class ProcessError(Exception):
+    """Exception raised when problems with processing file occur"""
+    def __init__(self, tool, text, filename=None):
+        self.tool = tool
+        self.text = text
+        self.filename = filename
 ######################################
 # Main Class
 ####
@@ -324,6 +356,8 @@ class Updater:
         self.makeCopy = False
         self.helpNeeded = False
         self.assumeYes = False
+        self.requestTimeout = 5
+        self.toolProcessTimeout = 180
 
         self.pages = []
 
@@ -388,9 +422,9 @@ class Updater:
                 t.start()
 
         for t in threads:
-            t.join(180) # wait 3 min per tool
+            t.join(self.toolProcessTimeout) # wait 3 min per tool
             if t.is_alive():
-                print("Timeout occured for {}".t.name)
+                print("Timeout occured for tool{}".t.name)
 
 
 
@@ -440,7 +474,15 @@ def processTool(tool, allowDownload, makeCopy, allowSymlink):
     if tool.isValid():
         if allowDownload:
             print("...download",tool)
-            tool.download()
+            startT = time.process_time()
+            try:
+                tool.download()
+                endT = time.process_time()
+                diffT = endT - startT
+            except DownloadError as e:
+                print("{} \t tool: {} url: {}".format(e.text, e.tool, e.url))
+            else:
+                print("downloaded {} ({:3.2f} s)".format(tool, diffT))
         if makeCopy:
             print("... copy jarfile for",tool)
             tool.copy()
