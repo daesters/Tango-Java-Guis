@@ -424,7 +424,7 @@ class Updater:
         for t in threads:
             t.join(self.toolProcessTimeout) # wait 3 min per tool
             if t.is_alive():
-                print("Timeout occured for tool{}".t.name)
+                print("Timeout occured for {}".format(t.name))
 
 
 
