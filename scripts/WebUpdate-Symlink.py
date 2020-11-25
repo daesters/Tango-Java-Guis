@@ -58,14 +58,22 @@ class Library:
     timeout = 10
 
     def __init__(self, tool, parameters):
+        self.requiredKeys = ['url']
         self._tool = tool
-        self._url = parameters['url']
+
+        if self._checkKeys(parameters):
+            self._url = parameters['url']
+
         self._version = ""
         self._downloadURL = ""
 
     def __str__(self):
         """String representation overload, for example when using print()"""
-        return self._tool+", "+"version: "+self._version
+        if self._version == "":
+            version = "?"
+        else:
+            version = self._version
+        return self._tool+", "+"version: "+version
 
     @property
     def tool(self):
@@ -102,6 +110,10 @@ class Library:
     def download(self):
         """Downloads a file from given URL
         Thanks to https://stackoverflow.com/a/34863581"""
+        if self.skip():
+            print("Skipped")
+            return
+
         if self._checkURL(self.downloadURL):
             with open(self.relativepath(), "wb") as jarfile:
                 try:
@@ -139,6 +151,10 @@ class Library:
             return False
 
         return True
+
+    def skip(self):
+        """Skipping tool"""
+        return self._skip
 
     # "Private" functions
     def _checkURL(self, url=""):
@@ -178,15 +194,31 @@ class Library:
         if self.debug:
             print(" ".join(text))
 
+    def _checkKeys(self, parameters):
+        """Check for skipping and required keys"""
+        if "skip" in parameters:
+            self._skip = True
+            return False
+        else:
+            self._skip = False
+        for key in self.requiredKeys:
+            if key not in parameters:
+                raise ConfigError(self._tool,
+                                  "key {} not found in "
+                                  "source config".format(key))
+        return True
 
 # ##
 # Class BintrayLib
 # ##
+
+
 class BintrayLib(Library):
     """Binaries from Bintray.com"""
 
     def __init__(self, tool, parameters):
         self._mavenFile = 'maven-metadata.xml'
+        self.requiredKeys = ['url']
         super().__init__(tool, parameters)
 
     @property
@@ -253,9 +285,12 @@ class GithubLib(Library):
 ###
 class GeneralLib(Library):
     def __init__(self, tool, parameters):
-        self._tool = tool
-        self._version = parameters['version']
-        self._downloadURL = parameters['url']
+        self.requiredKeys = ['url', 'version']
+        super().__init__(tool, parameters)
+
+        if self._checkKeys(parameters):
+            self._version = parameters['version']
+            self._downloadURL = parameters['url']
         self._parameters = parameters
 
     @property
@@ -335,6 +370,15 @@ class GeneralLib(Library):
 
 
 # User Exception classes
+
+
+class ConfigError(Exception):
+    """Exception raised when problems with configuration occur"""
+    def __init__(self, tool, text):
+        self.tool = tool
+        self.text = text
+
+
 class DownloadError(Exception):
     """Exception raised when problems with download occur"""
     def __init__(self, tool, text, url=None):
@@ -401,19 +445,35 @@ class Updater:
         print("Check binaries...")
 
         sources = {}
-        with open(SOURCE_FILE, 'r') as fsource:
-            sources = json.loads(fsource.read())
+        try:
+            with open(SOURCE_FILE, 'r') as fsource:
+                sources = json.loads(fsource.read())
 
-        self.pages.append([BintrayLib(tool, parameters) for
-                           tool, parameters in sources['bintray'].items()])
-        self.pages.append([GithubLib(tool, parameters) for
-                           tool, parameters in sources['github'].items()])
-        self.pages.append([GeneralLib(tool, parameters) for
-                           tool, parameters in sources['general'].items()])
+            self.pages.append([BintrayLib(tool, parameters) for
+                               tool, parameters in sources['bintray'].items()])
+            self.pages.append([GithubLib(tool, parameters) for
+                               tool, parameters in sources['github'].items()])
+            self.pages.append([GeneralLib(tool, parameters) for
+                               tool, parameters in sources['general'].items()])
 
-        print("Processing...")
-        self.process()
-        print("...done")
+            print("Processing...")
+            self.process()
+            print("...done")
+        except json.decoder.JSONDecodeError:
+            print("ERROR decoding source file!")
+            raise
+        except ConfigError as e:
+            print("ERROR when reading config for tool {}: {}".
+                  format(e.tool, e.text))
+            raise
+        except DownloadError as e:
+            print("ERROR when downlading tool {}: {}. url {}".
+                  format(e.tool, e.text, e.url))
+            raise
+        except ProcessError as e:
+            print("ERROR when processing file for tool {}: {}. file {}".
+                  format(e.tool, e.text, e.filename))
+            raise
 
     # ## Helpers
     def process(self):
@@ -477,6 +537,10 @@ class Updater:
 
 
 def processTool(tool, allowDownload, makeCopy, allowSymlink):
+    if tool.skip():
+        print("Skipped", tool)
+        return
+
     if tool.isValid():
         if allowDownload:
             print("...download", tool)

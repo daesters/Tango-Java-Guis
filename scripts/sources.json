@@ -50,7 +50,12 @@
         "TangORB": {
             "version": "8.3.5",
             "url": "https://master.dl.sourceforge.net/project/tango-cs/tools/TangORB-8.3.5_jeromq_android.jar",
-            "postAction": false
+            "postAction": false,
+            "skip": true
+        },
+        "Test": {
+            "version": "unknonw",
+            "skip": true
         }
     }
 }
