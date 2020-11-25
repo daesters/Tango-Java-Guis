@@ -54,7 +54,7 @@
             "skip": true
         },
         "Test": {
-            "version": "unknonw",
+            "version": "unknown",
             "skip": true
         }
     }
