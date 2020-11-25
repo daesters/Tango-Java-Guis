@@ -93,7 +93,6 @@ class Library:
         without version numbers"""
         return self.tool+".jar"
 
-
     def relativepath(self, name=""):
         """Path of the library file name or given name in lib folder"""
         if name == "":
@@ -108,9 +107,12 @@ class Library:
                 try:
                     jarfile.write(self._getFileContent(self.downloadURL))
                 except requests.exceptions.Timeout:
-                    raise DownloadError(self._tool, TIMEOUT_DOWNLOAD_TEXT, self.downloadURL)
+                    raise DownloadError(self._tool,
+                                        TIMEOUT_DOWNLOAD_TEXT,
+                                        self.downloadURL)
         else:
-            raise DownloadError(self._tool, ERROR_DOWNLOAD_TEXT, self.downloadURL)
+            raise DownloadError(self._tool, ERROR_DOWNLOAD_TEXT,
+                                self.downloadURL)
 
     def createSymlink(self):
         """Create a symlink to the jar file"""
@@ -185,17 +187,19 @@ class BintrayLib(Library):
 
     def __init__(self, tool, parameters):
         self._mavenFile = 'maven-metadata.xml'
-        super().__init__(tool,parameters)
+        super().__init__(tool, parameters)
 
     @property
     def version(self):
         """Returns the version of the tool"""
         if self._version == "":
             try:
-                self._debugPrint("    Request",self._mavenFile )
+                self._debugPrint("    Request", self._mavenFile)
                 xmltext = self._getFileText(self._url+self._mavenFile)
-                self._version = str(minidom.parseString(xmltext).getElementsByTagName('latest')[0].firstChild.nodeValue)
-            except:
+                self._version = str(minidom.parseString(xmltext).
+                                    getElementsByTagName('latest')[0].
+                                    firstChild.nodeValue)
+            except Exception:
                 self._version = ERROR_VERSION_TEXT
 
         return self._version
@@ -204,7 +208,8 @@ class BintrayLib(Library):
     def downloadURL(self):
         """Returns the download URL"""
         if self._downloadURL == "":
-            self._downloadURL = self._url+self.version+"/"+self._tool+"-"+self.version+".jar"
+            self._downloadURL = self._url + self.version + "/" +\
+                                self._tool+"-" + self.version+".jar"
 
         return self._downloadURL
 
@@ -215,16 +220,15 @@ class BintrayLib(Library):
 
 class GithubLib(Library):
     def __init__(self, tool, parameters):
-        super().__init__(tool,parameters)
+        super().__init__(tool, parameters)
         # Store request, therefore class attribute
         self._request = None
         self._getGithubInfos()
 
-
     @property
     def version(self):
         """Returns the version of the tool"""
-        if self._version == "" and self._request != None:
+        if self._version == "" and self._request is not None:
             self._version = self._request.json()['tag_name']
 
         return self._version
@@ -232,8 +236,9 @@ class GithubLib(Library):
     @property
     def downloadURL(self):
         """Returns the download URL"""
-        if self._downloadURL == "" and self._request != None:
-            self._downloadURL = self._request.json()['assets'][0]['browser_download_url']
+        if self._downloadURL == "" and self._request is not None:
+            self._downloadURL =\
+                self._request.json()['assets'][0]['browser_download_url']
 
         return self._downloadURL
 
@@ -274,7 +279,8 @@ class GeneralLib(Library):
             super().download()
 
     def _download(self):
-        """ Download file (usually a archive) and make post actions if defined"""
+        """Download file (usually a archive) and
+        make post actions if defined"""
 
         if self._checkURL(self.downloadURL):
             # Download
@@ -283,30 +289,30 @@ class GeneralLib(Library):
             with open(fpath, "wb") as f:
                 f.write(self._getFileContent(self.downloadURL))
 
-            #Action
+            # Action
             key = 'postParameters'
             fnKey = 'function'
             ptKey = 'path'
 
-            #Check postParameters
+            # Check postParameters
             if key in self._parameters.keys() and \
-                fnKey in self._parameters[key].keys() and \
-                ptKey in self._parameters[key].keys():
+                    fnKey in self._parameters[key].keys() and \
+                    ptKey in self._parameters[key].keys():
 
                 fn = self._parameters[key][fnKey]
                 path = self._parameters[key][ptKey]
-                #Unzip action
+                # Unzip action
                 if fn == 'unzip' and path != "":
-                    #Processing
+                    # Processing
                     self._debugPrint("      extract and move")
-                    exf = zipfile.ZipFile(fpath).extract(member=path,path=LIBFOLDER)
+                    exf = zipfile.ZipFile(fpath).\
+                        extract(member=path, path=LIBFOLDER)
 
                     try:
-                        os.rename(exf,self.relativepath())
+                        os.rename(exf, self.relativepath())
                     except FileExistsError:
                         os.remove(self.relativepath())
-                        os.rename(exf,self.relativepath())
-
+                        os.rename(exf, self.relativepath())
 
                     # Clean up
                     self._debugPrint("      clean up")
@@ -316,9 +322,9 @@ class GeneralLib(Library):
                         os.remove(fpath)
                     except OSError:
                         raise ProcessError("       Cleanup failed for tool",
-                                            self.tool, "!!!")
+                                           self.tool, "!!!")
                 else:
-                    #No post parameters
+                    # No post parameters
                     raise ProcessError(self._tool, ERROR_PROCESS_TEXT, fname)
 
             else:
@@ -347,8 +353,10 @@ class ProcessError(Exception):
 # Main Class
 ####
 
+
 class Updater:
-    def __init__(self, args = sys.argv):
+
+    def __init__(self, args=sys.argv):
 
         # default values
         self.allowSymlink = True
@@ -374,18 +382,19 @@ class Updater:
             answer = "invalid"
             if not self.assumeYes:
                 if self.allowDownload:
-                    answer = input("You really want to update the libs from the web? [Y/n]")
+                    answer = input("You really want to update "
+                                   "the libs from the web? [Y/n]")
                 elif self.makeCopy:
-                    answer = input("You really want to copy (and overwrite?) the libraries? [Y/n]")
+                    answer = input("You really want to copy (and overwrite?) "
+                                   "the libraries? [Y/n]")
                 elif self.allowSymlink:
-                    answer = input("You really want to create symbolic links? [Y/n]")
+                    answer = input("You really want to create "
+                                   "symbolic links? [Y/n]")
 
-
-            if self.assumeYes or answer in ["y","Y",""]:
+            if self.assumeYes or answer in ["y", "Y", ""]:
                 self.performUpdate()
             else:
                 print("Quit")
-
 
     def performUpdate(self):
         """Reads source file and updates binaries"""
@@ -406,7 +415,7 @@ class Updater:
         self.process()
         print("...done")
 
-    ### Helpers
+    # ## Helpers
     def process(self):
         """Downloads the items from the various sites"""
         threads = []
@@ -414,52 +423,49 @@ class Updater:
             for tool in page:
                 t = threading.Thread(target=processTool,
                                      name=tool,
-                                     args = (tool,
-                                             self.allowDownload,
-                                             self.makeCopy,
-                                             self.allowSymlink,))
+                                     args=(tool,
+                                           self.allowDownload,
+                                           self.makeCopy,
+                                           self.allowSymlink,))
                 threads.append(t)
                 t.start()
 
         for t in threads:
-            t.join(self.toolProcessTimeout) # wait 3 min per tool
+            t.join(self.toolProcessTimeout)  # wait 3 min per tool
             if t.is_alive():
                 print("Timeout occured for {}".format(t.name))
 
-
-
-
     def checkOptions(self, args):
         """ Checks the option arguments"""
-        ## Check debug flag
-        if self._isOption(args, '-d','--debug'):
-            Library.debug = True # so all Library subclasses know ;-)
-        ## Check download flag
-        if self._isOption(args, '-n','--no-download'):
-            self.allowDownload = False;
-        ## Check symlink flag
-        if self._isOption(args, '-t','--no-symlinks'):
-            self.allowSymlink = False;
-        ## Check copy flag
-        if self._isOption(args, '-c','--copy'):
-            self.makeCopy = True;
+        # Check debug flag
+        if self._isOption(args, '-d', '--debug'):
+            Library.debug = True  # so all Library subclasses know ;-)
+        # Check download flag
+        if self._isOption(args, '-n', '--no-download'):
+            self.allowDownload = False
+        # Check symlink flag
+        if self._isOption(args, '-t', '--no-symlinks'):
+            self.allowSymlink = False
+        # Check copy flag
+        if self._isOption(args, '-c', '--copy'):
+            self.makeCopy = True
         # Check help flag
-        if self._isOption(args, '-h','--help'):
-            self.helpNeeded = True;
+        if self._isOption(args, '-h', '--help'):
+            self.helpNeeded = True
         # Check assume-yes flag
         if self._isOption(args, '-y', '--assume-yes'):
-            self.assumeYes = True;
+            self.assumeYes = True
 
     def printHelp(self):
         print(
-            "This is the library updater, which takes the binaries " \
-            "from the various webpages \n" \
-            "Usage \n" \
-            "-d|--debug \t Debug option \n" \
-            "-n|--no-download \t Don't donwload files \n" \
-            "-t|--no-symlinks \t Don't create symlinks \n" \
-            "-c|--copy \t\t Create copies instead of symlinks \n" \
-            "-y|assume-yes \t Assume yes and don't ask questions\n" \
+            "This is the library updater, which takes the binaries "
+            "from the various webpages \n"
+            "Usage \n"
+            "-d|--debug \t Debug option \n"
+            "-n|--no-download \t Don't donwload files \n"
+            "-t|--no-symlinks \t Don't create symlinks \n"
+            "-c|--copy \t\t Create copies instead of symlinks \n"
+            "-y|assume-yes \t Assume yes and don't ask questions\n"
             "-h|--help \t This help"
         )
 
@@ -473,7 +479,7 @@ class Updater:
 def processTool(tool, allowDownload, makeCopy, allowSymlink):
     if tool.isValid():
         if allowDownload:
-            print("...download",tool)
+            print("...download", tool)
             startT = time.process_time()
             try:
                 tool.download()
@@ -484,15 +490,16 @@ def processTool(tool, allowDownload, makeCopy, allowSymlink):
             else:
                 print("downloaded {} ({:3.2f} s)".format(tool, diffT))
         if makeCopy:
-            print("... copy jarfile for",tool)
+            print("... copy jarfile for", tool)
             tool.copy()
         elif allowSymlink:
-            print("... create symlink for",tool)
+            print("... create symlink for", tool)
             tool.createSymlink()
     else:
-        print("Cannot download",tool)
+        print("Cannot download", tool)
 
-######## Shell script ############
+# ####### Shell script ############
+
 
 if __name__ == "__main__":
     updater = Updater(sys.argv)
