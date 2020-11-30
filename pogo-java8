@@ -1,17 +1,10 @@
 #!/bin/bash
 
-JAVA_VERSION_NEEDED=11
-
+JAVA_VERSIONS_ACCEPTED=6,8
 #---------------------------------------------------------
 #      Checking java version 
 #---------------------------------------------------------
-
-JAVA_VERSION=`java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f-2`
-if [ "$JAVA_VERSION" != "$JAVA_VERSION_NEEDED" ]; then
-        echo "Using java version $JAVA_VERSION instead of $JAVA_VERSION_NEEDED. Might not work"
-else
-        echo "Using java version $JAVA_VERSION. Should work"
-fi
+source check-java-version.sh
 
 #---------------------------------------------------------
 #       Open TANGO settings if any
