@@ -39,6 +39,33 @@ ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
 TIMEOUT_TOOL_PROCESS_TEXT = "Couldn't finish proccessing, timeout occured"
 
+class Files:
+    def __init__(self, folder="../libs"):
+        if folder != "":
+            if os.path.exists(folder):
+                myfiles = [files for _, _, files in os.walk(folder)][0]
+                self.jarfiles = [file for file in myfiles if ".jar" in file]
+            else:
+                raise ProcessError("       Scanning folder {} failed ".format(folder),
+                                           self, "!!!")
+        
+    def get_downloaded_version(tool):
+        """Returns the local version from a downloaded file
+        """
+        if hasattr(self, 'jarfiles'):
+            version_files = [file for file in self.jarfiles if tool in file and "-" in file]
+            versions = []
+            for file in version_files:
+                v = file.split("-")[1].split(".jar")[0]
+                versions.append(v)
+            
+            if len(versions) > 1:
+                return versions
+            elif len(versions) == 1:
+                return versions[0]
+            else:
+                return None
+            
 
 # ####### Classes ############
 
@@ -57,15 +84,18 @@ class Library:
     debug = False
     timeout = 10
 
-    def __init__(self, tool, parameters):
+    def __init__(self, tool, parameters, offline=False):
         self.requiredKeys = ['url']
         self._tool = tool
+        self._offline = offline
 
         if self._checkKeys(parameters):
             self._url = parameters['url']
 
         self._version = ""
         self._downloadURL = ""
+        
+        self._files = Files()
 
     def __str__(self):
         """String representation overload, for example when using print()"""
@@ -154,19 +184,27 @@ class Library:
 
     def skip(self):
         """Skipping tool"""
-        return self._skip
+        return self._skip and self._offline
 
     # "Private" functions
     def _checkURL(self, url=""):
         """Check if URL exists"""
         if url == "":
             url = self._url
+            
+        if self._offline:
+            print("Don't check URLs when offline")
+            return False
 
         try:
             status = requests.head(url).status_code
         except ConnectionError:
             print("Connection error to {}".format(url))
             return False
+        except Exception:
+            print("General network error. Connection could not be "
+                  "established to {}".format(url))
+            return False            
 
         # corresponds to HTTP 200 and 302
         if status in [requests.codes.ok, requests.codes.found]:
@@ -216,10 +254,10 @@ class Library:
 class BintrayLib(Library):
     """Binaries from Bintray.com"""
 
-    def __init__(self, tool, parameters):
+    def __init__(self, tool, parameters, offline=False):
         self._mavenFile = 'maven-metadata.xml'
         self.requiredKeys = ['url']
-        super().__init__(tool, parameters)
+        super().__init__(tool, parameters, offline)
 
     @property
     def version(self):
@@ -251,8 +289,8 @@ class BintrayLib(Library):
 ###
 
 class GithubLib(Library):
-    def __init__(self, tool, parameters):
-        super().__init__(tool, parameters)
+    def __init__(self, tool, parameters, offline=False):
+        super().__init__(tool, parameters, offline)
         # Store request, therefore class attribute
         self._request = None
         self._getGithubInfos()
@@ -262,6 +300,8 @@ class GithubLib(Library):
         """Returns the version of the tool"""
         if self._version == "" and self._request is not None:
             self._version = self._request.json()['tag_name']
+        else:
+            
 
         return self._version
 
@@ -284,9 +324,9 @@ class GithubLib(Library):
 # Class GeneralLib
 ###
 class GeneralLib(Library):
-    def __init__(self, tool, parameters):
+    def __init__(self, tool, parameters, offline=False):
         self.requiredKeys = ['url', 'version']
-        super().__init__(tool, parameters)
+        super().__init__(tool, parameters, offline)
 
         if self._checkKeys(parameters):
             self._version = parameters['version']
@@ -436,11 +476,27 @@ class Updater:
                                    "symbolic links? [Y/n]")
 
             if self.assumeYes or answer in ["y", "Y", ""]:
-                self.performUpdate()
-            else:
-                print("Quit")
+                try:
+                    self.initTools()
+                    print("Processing...")
+                    self.process()
+                    print("...done")
+                except ConfigError as e:
+                    print("ERROR when reading config for tool {}: {}".
+                          format(e.tool, e.text))
+                    raise
+                except DownloadError as e:
+                    print("ERROR when downlading tool {}: {}. url {}".
+                          format(e.tool, e.text, e.url))
+                    raise
+                except ProcessError as e:
+                    print("ERROR when processing file for tool {}: {}. file {}".
+                          format(e.tool, e.text, e.filename))
+                    raise
+                else:
+                    print("Quit")
 
-    def performUpdate(self):
+    def initTools(self):
         """Reads source file and updates binaries"""
         print("Check binaries...")
 
@@ -449,31 +505,18 @@ class Updater:
             with open(SOURCE_FILE, 'r') as fsource:
                 sources = json.loads(fsource.read())
 
-            self.pages.append([BintrayLib(tool, parameters) for
+            self.pages.append([BintrayLib(tool, parameters, self.allowDownload) for
                                tool, parameters in sources['bintray'].items()])
-            self.pages.append([GithubLib(tool, parameters) for
+            self.pages.append([GithubLib(tool, parameters, self.allowDownload) for
                                tool, parameters in sources['github'].items()])
-            self.pages.append([GeneralLib(tool, parameters) for
+            self.pages.append([GeneralLib(tool, parameters, self.allowDownload) for
                                tool, parameters in sources['general'].items()])
 
-            print("Processing...")
-            self.process()
-            print("...done")
+            
         except json.decoder.JSONDecodeError:
             print("ERROR decoding source file!")
             raise
-        except ConfigError as e:
-            print("ERROR when reading config for tool {}: {}".
-                  format(e.tool, e.text))
-            raise
-        except DownloadError as e:
-            print("ERROR when downlading tool {}: {}. url {}".
-                  format(e.tool, e.text, e.url))
-            raise
-        except ProcessError as e:
-            print("ERROR when processing file for tool {}: {}. file {}".
-                  format(e.tool, e.text, e.filename))
-            raise
+        
 
     # ## Helpers
     def process(self):
