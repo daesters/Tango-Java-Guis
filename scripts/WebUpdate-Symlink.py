@@ -54,17 +54,19 @@ class Files:
                 raise ProcessError(f"       Scanning folder {folder} failed ",
                                    self, "!!!")
 
-    def get_downloaded_version(tool):
+    def get_downloaded_version(self, tool):
         """Returns the local version from a downloaded file
         """
+        print(f"{tool} asked for version")
         if hasattr(self, 'libfiles'):
             version_files = [file for file in self.libfiles
                              if tool in file and "-" in file]
             versions = []
             for file in version_files:
-                v = _get_version_from_name(file)
+                v = self._get_version_from_name(file)
                 versions.append(v)
 
+            print(f"version for {tool} is {versions}")
             if len(versions) > 1:
                 return versions
             elif len(versions) == 1:
@@ -72,11 +74,10 @@ class Files:
             else:
                 return None
 
-    def _get_version_from_name(filename):
+    def _get_version_from_name(self, filename, version_split = "-"):
         """ From the filename it derives the version
         """
-        version_split = "-"
-        return filename.split("-")[1].split(self.filetype)[0]
+        return filename.split(version_split)[1].split(self.filetype)[0]
 
 
 # ####### Classes ############
@@ -258,6 +259,14 @@ class Library:
                                   "source config".format(key))
         return True
 
+    def _get_downloaded_version(self):
+        versions = self._files.get_downloaded_version(self._tool)
+        if type(versions) is list:
+            # take newest version
+            return versions.sort()[-1]
+        else:
+            return versions
+
 # ##
 # Class BintrayLib
 # ##
@@ -274,7 +283,7 @@ class BintrayLib(Library):
     @property
     def version(self):
         """Returns the version of the tool"""
-        if self._version == "":
+        if self._version == "" and not self._offline:
             try:
                 self._debugPrint("    Request", self._mavenFile)
                 xmltext = self._getFileText(self._url+self._mavenFile)
@@ -283,6 +292,8 @@ class BintrayLib(Library):
                                     firstChild.nodeValue)
             except Exception:
                 self._version = ERROR_VERSION_TEXT
+        elif self._offline:
+            self._version = self._get_downloaded_version()
 
         return self._version
 
@@ -313,7 +324,7 @@ class GithubLib(Library):
         if self._version == "" and self._request is not None:
             self._version = self._request.json()['tag_name']
         else:
-
+            self._version = self._get_downloaded_version()
 
         return self._version
 
@@ -457,6 +468,7 @@ class Updater:
         # default values
         self.allowSymlink = True
         self.allowDownload = True
+        self.offline = False
         self.makeCopy = False
         self.helpNeeded = False
         self.assumeYes = False
@@ -517,11 +529,11 @@ class Updater:
             with open(SOURCE_FILE, 'r') as fsource:
                 sources = json.loads(fsource.read())
 
-            self.pages.append([BintrayLib(tool, parameters, self.allowDownload) for
+            self.pages.append([BintrayLib(tool, parameters, self.offline) for
                                tool, parameters in sources['bintray'].items()])
-            self.pages.append([GithubLib(tool, parameters, self.allowDownload) for
+            self.pages.append([GithubLib(tool, parameters, self.offline) for
                                tool, parameters in sources['github'].items()])
-            self.pages.append([GeneralLib(tool, parameters, self.allowDownload) for
+            self.pages.append([GeneralLib(tool, parameters, self.offline) for
                                tool, parameters in sources['general'].items()])
 
         except json.decoder.JSONDecodeError:
@@ -556,6 +568,9 @@ class Updater:
         # Check download flag
         if self._isOption(args, '-n', '--no-download'):
             self.allowDownload = False
+        if self._isOption(args, '-o', '--offline'):
+            self.allowDownload = False
+            self.offline = True
         # Check symlink flag
         if self._isOption(args, '-t', '--no-symlinks'):
             self.allowSymlink = False
@@ -576,6 +591,7 @@ class Updater:
             "Usage \n"
             "-d|--debug \t Debug option \n"
             "-n|--no-download \t Don't donwload files \n"
+            "-o|--offline \t Don't connecto to the internet -> no-download \n"
             "-t|--no-symlinks \t Don't create symlinks \n"
             "-c|--copy \t\t Create copies instead of symlinks \n"
             "-y|assume-yes \t Assume yes and don't ask questions\n"

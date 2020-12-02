@@ -27,7 +27,7 @@ export MY_OS
 APP_DIR=libs;			export APP_DIR
 PREF_DIR=libs;			export PREF_DIR
 
-POGO_CLASS=$APP_DIR/Pogo-java8-9.6.31.jar;		export POGO_CLASS
+POGO_CLASS=$APP_DIR/Pogo-9.6.31-java8.jar;		export POGO_CLASS
 
 CLASSPATH=$PREF_DIR:$POGO_CLASS;    export CLASSPATH
 
