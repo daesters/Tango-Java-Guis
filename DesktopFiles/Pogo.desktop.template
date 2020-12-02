@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Pogo
+Exec=$HOME/Desktop/TangoGuis/GenericGuis/pogo
+Icon=$HOME/.local/share/icons/Pogo.png
+Type=Application
+OnlyShowIn=GNOME;Unity;
+
