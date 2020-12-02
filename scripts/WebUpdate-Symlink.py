@@ -40,6 +40,39 @@ ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
 TIMEOUT_TOOL_PROCESS_TEXT = "Couldn't finish proccessing, timeout occured"
 
 
+# thanks goes to joeld and Mike Pennington, https://stackoverflow.com/a/287944
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+class Output:
+    def warning(msg):
+        print(f"{bcolors.WARNING}", msg, f"{bcolors.ENDC}")
+
+    def fail(msg):
+        print(f"{bcolors.FAIL}", msg, f"{bcolors.ENDC}")
+
+    def header(msg):
+        print(f"{bcolors.HEADER}", msg, f"{bcolors.ENDC}")
+
+    def okGreen(msg):
+        print(f"{bcolors.OKGREEN}", msg, f"{bcolors.ENDC}")
+
+    def okBlue(msg):
+        print(f"{bcolors.OKBLUE}", msg, f"{bcolors.ENDC}")
+
+    def okCyan(msg):
+        print(f"{bcolors.OKCYAN}", msg, f"{bcolors.ENDC}")
+
+
 class Files:
     def __init__(self, folder="../libs", filetype='.jar'):
         """ Looks for the library files (typically 'jar' files) and
@@ -57,7 +90,6 @@ class Files:
     def get_downloaded_version(self, tool):
         """Returns the local version from a downloaded file
         """
-        print(f"{tool} asked for version")
         if hasattr(self, 'libfiles'):
             version_files = [file for file in self.libfiles
                              if tool in file and "-" in file]
@@ -66,7 +98,6 @@ class Files:
                 v = self._get_version_from_name(file)
                 versions.append(v)
 
-            print(f"version for {tool} is {versions}")
             if len(versions) > 1:
                 return versions
             elif len(versions) == 1:
@@ -206,24 +237,23 @@ class Library:
             url = self._url
 
         if self._offline:
-            print("Don't check URLs when offline")
             return False
 
         try:
             status = requests.head(url).status_code
         except ConnectionError:
-            print("Connection error to {}".format(url))
+            Output.warning(f"Connection error to {url}")
             return False
         except Exception:
-            print("General network error. Connection could not be "
-                  "established to {}".format(url))
+            Output.warning("General network error. Connection could not be "
+                           f"established to {url}")
             return False
 
         # corresponds to HTTP 200 and 302
         if status in [requests.codes.ok, requests.codes.found]:
             return True
         else:
-            print("Access error, status: {}, url: {}".format(status, url))
+            Output.warning(f"Access error, status: {status}, url: {url}")
             return False
 
     def _getFileContent(self, url):
@@ -461,7 +491,7 @@ class ProcessError(Exception):
 ####
 
 
-class Updater:
+class Manager:
 
     def __init__(self, args=sys.argv):
 
@@ -485,14 +515,14 @@ class Updater:
         if self.helpNeeded:
             self.printHelp()
         elif not self.allowSymlink and not self.allowDownload:
-            print("There is nothing to do... Quit")
+            Output.okCyan("There is nothing to do... Quit")
         else:
             answer = "invalid"
             if not self.assumeYes:
                 if self.allowDownload:
                     answer = input("You really want to update "
                                    "the libs from the web? [Y/n]")
-                elif self.makeCopy:
+                if self.makeCopy:
                     answer = input("You really want to copy (and overwrite?) "
                                    "the libraries? [Y/n]")
                 elif self.allowSymlink:
@@ -629,11 +659,11 @@ def processTool(tool, allowDownload, makeCopy, allowSymlink):
             print("... create symlink for", tool)
             tool.createSymlink()
     else:
-        print("Cannot download", tool)
+        Output.fail(f"Cannot download {tool}")
 
 # ####### Shell script ############
 
 
 if __name__ == "__main__":
-    updater = Updater(sys.argv)
-    updater.action()
+    manager = Manager(sys.argv)
+    manager.action()
