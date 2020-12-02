@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 #---------------------------------------------------------
 #      Checking java version 
 #---------------------------------------------------------
@@ -45,4 +46,4 @@ echo "Starting Pogo Appli under $MY_OS.  "
 #		-Dfile.encoding=ISO-8859-1 	\
 #		org.tango.pogo.pogo_gui.Pogo $*
 
-/usr/bin/java  $APPLI_PACKAGE.$APPLI_MAIN_CLASS $@
+$JAVA_BIN  $APPLI_PACKAGE.$APPLI_MAIN_CLASS $@

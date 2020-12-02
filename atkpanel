@@ -53,4 +53,4 @@ export LIBPATH
 #	Start the atkpanel process
 #---------------------------------------------------------
 
-/usr/bin/java -mx128m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST atkpanel.MainPanel $*
+$JAVA_BIN -mx128m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST atkpanel.MainPanel $*
