@@ -39,33 +39,45 @@ ERROR_DOWNLOAD_TEXT = "Couldn't download"
 ERROR_PROCESS_TEXT = "Couldn't process downloaded file"
 TIMEOUT_TOOL_PROCESS_TEXT = "Couldn't finish proccessing, timeout occured"
 
+
 class Files:
-    def __init__(self, folder="../libs"):
+    def __init__(self, folder="../libs", filetype='.jar'):
+        """ Looks for the library files (typically 'jar' files) and
+        stores them in a list
+        """
         if folder != "":
             if os.path.exists(folder):
                 myfiles = [files for _, _, files in os.walk(folder)][0]
-                self.jarfiles = [file for file in myfiles if ".jar" in file]
+                self.libfiles = [file for file in myfiles if filetype in file]
+                self.filetype = filetype
             else:
-                raise ProcessError("       Scanning folder {} failed ".format(folder),
-                                           self, "!!!")
-        
+                raise ProcessError(f"       Scanning folder {folder} failed ",
+                                   self, "!!!")
+
     def get_downloaded_version(tool):
         """Returns the local version from a downloaded file
         """
-        if hasattr(self, 'jarfiles'):
-            version_files = [file for file in self.jarfiles if tool in file and "-" in file]
+        if hasattr(self, 'libfiles'):
+            version_files = [file for file in self.libfiles
+                             if tool in file and "-" in file]
             versions = []
             for file in version_files:
-                v = file.split("-")[1].split(".jar")[0]
+                v = _get_version_from_name(file)
                 versions.append(v)
-            
+
             if len(versions) > 1:
                 return versions
             elif len(versions) == 1:
                 return versions[0]
             else:
                 return None
-            
+
+    def _get_version_from_name(filename):
+        """ From the filename it derives the version
+        """
+        version_split = "-"
+        return filename.split("-")[1].split(self.filetype)[0]
+
 
 # ####### Classes ############
 
@@ -94,7 +106,7 @@ class Library:
 
         self._version = ""
         self._downloadURL = ""
-        
+
         self._files = Files()
 
     def __str__(self):
@@ -191,7 +203,7 @@ class Library:
         """Check if URL exists"""
         if url == "":
             url = self._url
-            
+
         if self._offline:
             print("Don't check URLs when offline")
             return False
@@ -204,7 +216,7 @@ class Library:
         except Exception:
             print("General network error. Connection could not be "
                   "established to {}".format(url))
-            return False            
+            return False
 
         # corresponds to HTTP 200 and 302
         if status in [requests.codes.ok, requests.codes.found]:
@@ -301,7 +313,7 @@ class GithubLib(Library):
         if self._version == "" and self._request is not None:
             self._version = self._request.json()['tag_name']
         else:
-            
+
 
         return self._version
 
@@ -512,11 +524,9 @@ class Updater:
             self.pages.append([GeneralLib(tool, parameters, self.allowDownload) for
                                tool, parameters in sources['general'].items()])
 
-            
         except json.decoder.JSONDecodeError:
             print("ERROR decoding source file!")
             raise
-        
 
     # ## Helpers
     def process(self):
