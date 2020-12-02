@@ -624,7 +624,7 @@ class Manager:
             "-o|--offline \t Don't connecto to the internet -> no-download \n"
             "-t|--no-symlinks \t Don't create symlinks \n"
             "-c|--copy \t\t Create copies instead of symlinks \n"
-            "-y|assume-yes \t Assume yes and don't ask questions\n"
+            "-y|--assume-yes \t Assume yes and don't ask questions\n"
             "-h|--help \t This help"
         )
 
@@ -659,7 +659,7 @@ def processTool(tool, allowDownload, makeCopy, allowSymlink):
             print("... create symlink for", tool)
             tool.createSymlink()
     else:
-        Output.fail(f"Cannot download {tool}")
+        Output.fail(f"Cannot process {tool}")
 
 # ####### Shell script ############
 
