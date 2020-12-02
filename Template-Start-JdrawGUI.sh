@@ -3,11 +3,14 @@
 # Settings for this gui
 GUINAME=MainGui.jdw
 PATH_GENERIC_GUIS=../GenericGuis
+JAVA_BIN=/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+JAVA_VERSIONS_ACCEPTED=6,8
 
 #optional
 TANGO_HOST=orkan.mott.loc:10000
 JAVA_VERSION_NEEDED=1.8
 MEMORY_ALLOCATION=32 #memory allocation in Megabytes
+
 # -------------------
 # The rest should work witouth new settings ;-)
 
@@ -15,12 +18,7 @@ MEMORY_ALLOCATION=32 #memory allocation in Megabytes
 #      Checking java version 
 #---------------------------------------------------------
 
-JAVA_VERSION=`java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f-2`
-if [ "$JAVA_VERSION" != "$JAVA_VERSION_NEEDED" ]; then
-        echo "Using java version $JAVA_VERSION instead of $JAVA_VERSION_NEEDED. Might not work"
-else
-        echo "Using java version $JAVA_VERSION. Should work"
-fi
+source check-java-version.sh
 
 #---------------------------------------------------------
 #       Open TANGO settings if any
@@ -54,5 +52,5 @@ LIBPATH=./libs
 #---------------------------------------------------------
 #
 
-java -mx"$MEMORY_ALLOCATION"m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST $APPLI_PACKAGE.$APPLI_MAIN_CLASS $GUINAME
+$JAVA_BIN -mx"$MEMORY_ALLOCATION"m -Djava.library.path=$LIBPATH -DTANGO_HOST=$TANGO_HOST $APPLI_PACKAGE.$APPLI_MAIN_CLASS $GUINAME
 

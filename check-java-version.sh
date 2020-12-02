@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # In the main shell script, include the following variable
 # JAVA_VERSIONS_ACCEPTED=11,13,14
