@@ -26,6 +26,8 @@ USER_ICONDIR=$HOME/.local/share/icons
 DEFAULT_SCRIPTPATH='$HOME/Desktop/TangoGuis/GenericGuis'
 DEFAULT_ICONPATH='$HOME/.local/share/icons'
 
+PROGRAMS="Astor Jive Trends Jdraw"
+
 help() {
 	cat << EOF
 Usage: install.sh [OPTION...]
@@ -37,62 +39,51 @@ EOF
 
 }
 
-# Helper for uninstall
-uninstall_helper() {
-	# Desktop files
-	rm $1/Astor.desktop	
-	rm $1/Jive.desktop	
-	rm $1/Trends.desktop	
-	rm $1/Jdraw.desktop
-
-	# icons
-	rm $2/Astor.png 
-	rm $2/Trends.png
-	rm $2/Jive.png
-	rm $2/Jdraw.png
-}
-
 # Main uninstall function
 uninstall() {
 	uninstall_helper $USER_APPLICATIONSDIR $USER_ICONDIR
 	uninstall_helper $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
 }
 
+# Helper for uninstall
+uninstall_helper() {
+	# parameter 1: application dir
+	 # parameter 2: Icon dir
+	# Desktop files
+	for program in $PROGRAMS; do
+		rm $1/$program.desktop
+	done
+
+	# icons
+	for program in $PROGRAMS; do
+		rm $2/$program.png
+	done
+}
+
 # Uses the templates and replaces the correct path
 fill_templates() {
+	# parameter 1: application dir
+	 # parameter 2: Icon dir
 	# Replace default path with the current programm path
-	cat Jive.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jive.desktop
-	cat Astor.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Astor.desktop
-	cat Trends.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Trends.desktop
-	cat Jdraw.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > Jdraw.desktop
+	for program in $PROGRAMS; do
+		cat $program.desktop.template | sed "s+$DEFAULT_SCRIPTPATH+$PROGRAMPATH+g" |  sed "s+$DEFAULT_ICONPATH+$2+g" > $program.desktop
+	done
 }
 
 
 # Copies and moves the icons and desktop files
 copy_and_move() {
-
+	# parameter 1: application dir
+	 # parameter 2: Icon dir
 	# Move Desktop files and copy icons
 
-	cp -f ./Astor.png $2
-	cp -f ./Trends.png $2
-	cp -f ./Jive.png $2
-	cp -f ./Jdraw.png $2
-
-	mv -f ./Astor.desktop $1
-	chmod u+x $1/Astor.desktop
-	chmod go-x $1/Astor.desktop
-	
-	mv -f ./Jive.desktop $1
-	chmod u+x $1/Jive.desktop
-	chmod go-x $1/Jive.desktop
-
-	mv -f ./Trends.desktop $1/
-	chmod u+x $1/Trends.desktop
-	chmod go-x $1/Trends.desktop
-
-	mv -f ./Jdraw.desktop $1/
-	chmod u+x $1/Jdraw.desktop
-	chmod go-x $1/Jdraw.desktop
+	for program in $PROGRAMS; do
+		cp -f ./$program.png $2
+	 
+		 mv -f  ./$program.desktop $1
+		 chmod u+x $1/$program.desktop
+		 chmod go-x $1/$program.desktop
+	done
 }
 
 # Checks for the directory for icons and creates it, if necessary
@@ -103,18 +94,12 @@ check_create_dir() {
 	fi
 }
 
-
-
 # Main programm, local user installation
 run_user() {
 
-	
 	fill_templates $USER_APPLICATIONSDIR $USER_ICONDIR
-
 	check_create_dir $USER_ICONDIR
-
 	copy_and_move $USER_APPLICATIONSDIR $USER_ICONDIR
-
 	echo "Installation successful"
 }
 
@@ -123,11 +108,8 @@ run_user() {
 run_as_sudo() {
 
 	fill_templates $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
-	
 	check_create_dir $GLOBAL_APPLICATIONSDIR
-
 	copy_and_move $GLOBAL_APPLICATIONSDIR $GLOBAL_ICONDIR
-	
 	echo "Installation successful"
 }
 
@@ -145,7 +127,6 @@ if [ ! -z "$1" ] && ([ $1 = "--uninstall" ] || [ $1 = "-u" ]) ; then
 	exit
 fi
 
-
 # Normal operation from here on
 
 if [ `whoami` != root ]; then
@@ -153,7 +134,7 @@ if [ `whoami` != root ]; then
     	run_user
 else
    	echo You are running as sudo, installing in $GLOBAL_APPLICATIONSDIR
-    	#run_as_sudo
+    run_as_sudo
 fi
 
 
