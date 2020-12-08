@@ -9,3 +9,5 @@ __pycache__
 libs/*.jar
 !libs/*-*.jar
 
+# No project stuff
+.spyproject/
