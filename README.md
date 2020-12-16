@@ -16,7 +16,7 @@ Start the TANGO Guis in your shell, for example
 
 #### Set TANGO_HOST
 * Export the TANGO-Host Variable in your shell with the following commmand:
-  export TANGO_HOST=<yourtangohost>:10000
+  `export TANGO_HOST=<yourtangohost>:10000`
   
   If you have the TANGO locally installed, use *localhost* instead of *<yourtangohost>*.
  
@@ -35,7 +35,7 @@ In order to avoid to change the scripts every time an update has been performed,
 If you have updated the repo or just clone, you need to performe the creation of symlinks /copies.
 
 1. Go to the folder scripts
-2. Execute CreateSymlinks.sh (linux) or CreateCopies.bat (Windows)
+2. Execute `CreateSymlinks.sh` (linux) or `CreateCopies.bat` (Windows)
 
 
 ## Update binaires
